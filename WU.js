@@ -61,7 +61,7 @@ function guessCurrentCondition(observation) {
 
     if (precipRate > 0) {
         condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Raining";
-    } else if (solarRadiation > 100 && uvIndex >= 1) {
+    } else if (solarRadiation > 140 && uvIndex >= 1) {
         condition = "☀️ Sunny";
     } else if (windSpeed > 1) {
         condition = "💨 Breezy";
@@ -69,9 +69,9 @@ function guessCurrentCondition(observation) {
         condition = "💨 Windy";
     } else if (solarRadiation <= 0) {
         condition = "🌃 Night";
-    } else if (humidity > 70 && solarRadiation >= 30 && solarRadiation < 100) {
+    } else if (humidity > 70 && solarRadiation >= 45 && solarRadiation < 140) {
         condition = "🌤️ Hazy";
-    } else if (humidity > 87 && solarRadiation >= 1 && solarRadiation < 30) {
+    } else if (humidity > 87 && solarRadiation >= 1 && solarRadiation < 45) {
         condition = "☁️ Overcast";
     } else {
         condition = "☀️ Daytime";
