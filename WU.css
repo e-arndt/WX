@@ -1,0 +1,74 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: rgb(79, 14, 14);
+    font-size: 1.2rem;
+}
+
+h1 {
+    color: rgb(255, 230, 45);
+    text-align: center;
+}
+
+
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.group {
+    flex: 1 1 calc(33% - 24px);
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-left: 15px;
+}
+
+.group-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.temp-humidity-windchill {
+    background-color: #7fe16e;
+}
+
+.wind-speed-gust-direction {
+    background-color: #8fd6f6;
+}
+
+.solar-uv {
+    background-color: #f5c47a;
+}
+
+.pressure {
+    background-color: #f7acf7;
+}
+
+.precip-rate {
+    background-color: #f5adad;
+}
+
+.group.current-condition {
+    background-color: #eaa550; /* Light blue background */
+    border: 1px solid #64b5f6; /* Blue border */
+    color: #000000; /* Dark blue text */
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.update-info {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #cd95f7;
+}
+
+.center {
+    text-align: center;
+}
+
