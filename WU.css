@@ -53,11 +53,11 @@ h1 {
 }
 
 .group.current-condition {
-    background-color: #eaa550; /* Light blue background */
+    background-color: #eeee30; /* Light blue background */
     border: 1px solid #64b5f6; /* Blue border */
     color: #000000; /* Dark blue text */
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
 
 .update-info {
