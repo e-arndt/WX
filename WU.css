@@ -19,7 +19,7 @@ h1 {
 }
 
 .group {
-    flex: 1 1 calc(33% - 26px);
+    flex: 1 1 calc(33% - 45px);
     margin-bottom: 10px;
     padding: 5px;
     border: 1px solid #ccc;
