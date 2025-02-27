@@ -73,7 +73,7 @@ function guessCurrentCondition(observation) {
         return "💨 Windy";
     }
 
-    if (solarRadiation <= 0 && uvIndex < 1) {
+    if (solarRadiation <= 0) {
         return "🌃 Night";
     }
 
