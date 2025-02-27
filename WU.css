@@ -22,7 +22,6 @@ h1 {
     flex: 1 1 calc(33% - 45px);
     margin-bottom: 10px;
     padding: 5px;
-    border: 1px solid #ccc;
     border-radius: 5px;
     padding-left: 25px;
     border: 2px solid #0b0b0b;
