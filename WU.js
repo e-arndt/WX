@@ -57,32 +57,41 @@ function guessCurrentCondition(observation) {
     const uvIndex = observation.uv;
     const precipRate = observation.imperial.precipRate;
 
+    let condition = "";
+
     if (precipRate > 0) {
-        if (temperature <= 33) {
-            return "❄️ Snowing";
-        } else {
-            return "🌧️ Raining";
-        }
+        condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Raining";
+    } else if (solarRadiation > 200 && uvIndex > 1) {
+        condition = "☀️ Sunny";
+    } else if (windSpeed > 5) {
+        condition = "💨 Windy";
+    } else if (solarRadiation <= 0) {
+        condition = "🌃 Night";
+    } else if (humidity > 90 && solarRadiation >= 15 && solarRadiation < 100) {
+        condition = "☁️ Overcast";
+    } else {
+        condition = "🌤️ Clear";
     }
 
-    if (solarRadiation > 200 && uvIndex > 1) {
-        return "☀️ Sunny";
-    }
-
-    if (windSpeed > 5) {
-        return "💨 Windy";
-    }
-
-    if (solarRadiation <= 0) {
-        return "🌃 Night";
-    }
-
-    if (humidity > 90 && solarRadiation >= 15 && solarRadiation < 100) {
-        return "☁️ Overcast";
-    }
-
-    return "🌤️ Clear";
+    const temperatureDescriptor = getTemperatureDescriptor(temperature);
+    return `${condition} & ${temperatureDescriptor}`;
 }
+
+function getTemperatureDescriptor(temp) {
+    if (temp < 15) return "Extreme Cold";
+    if (temp >= 16 && temp < 25) return "Bitter Cold";
+    if (temp >= 26 && temp < 34) return "Freezing";
+    if (temp >= 35 && temp < 55) return "Cold";
+    if (temp >= 56 && temp < 65) return "Mild";
+    if (temp >= 66 && temp < 75) return "Comfortable";
+    if (temp >= 76 && temp < 82) return "Warm";
+    if (temp >= 83 && temp < 90) return "Hot";
+    if (temp >= 91 && temp < 96) return "Very Hot";
+    if (temp >= 97) return "Extreme Heat";
+
+    return "Unknown";
+}
+
 
 
 
