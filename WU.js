@@ -84,15 +84,15 @@ function guessCurrentCondition(observation) {
 
 function getTemperatureDescriptor(temp) {
     if (temp < 15) return "Extreme Cold";
-    if (temp >= 16 && temp < 25) return "Bitter Cold";
-    if (temp >= 26 && temp < 34) return "Freezing";
-    if (temp >= 35 && temp < 55) return "Cold";
-    if (temp >= 56 && temp < 65) return "Mild";
-    if (temp >= 66 && temp < 75) return "Comfortable";
-    if (temp >= 76 && temp < 82) return "Warm";
-    if (temp >= 83 && temp < 90) return "Hot";
-    if (temp >= 91 && temp < 96) return "Very Hot";
-    if (temp >= 97) return "Extreme Heat";
+    if (temp >= 15 && temp < 25) return "Bitter Cold";
+    if (temp >= 25 && temp < 34) return "Freezing";
+    if (temp >= 34 && temp < 55) return "Cold";
+    if (temp >= 55 && temp < 65) return "Mild";
+    if (temp >= 65 && temp < 75) return "Comfortable";
+    if (temp >= 75 && temp < 82) return "Warm";
+    if (temp >= 82 && temp < 90) return "Hot";
+    if (temp >= 90 && temp < 96) return "Very Hot";
+    if (temp >= 96) return "Extreme Heat";
 
     return "Unknown";
 }
