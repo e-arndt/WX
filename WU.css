@@ -19,12 +19,13 @@ h1 {
 }
 
 .group {
-    flex: 1 1 calc(33% - 24px);
+    flex: 1 1 calc(33% - 26px);
     margin-bottom: 10px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding-left: 15px;
+    border: 2px solid #0b0b0b;
 }
 
 .group-title {
@@ -52,10 +53,8 @@ h1 {
     background-color: #f5adad;
 }
 
-.group.current-condition {
-    background-color: #eeee30; /* Light blue background */
-    border: 1px solid #64b5f6; /* Blue border */
-    color: #000000; /* Dark blue text */
+.group.current-condition { 
+    color: #000000; 
     text-align: center;
     font-size: 1.75rem;
 }
@@ -63,7 +62,7 @@ h1 {
 .update-info {
     margin-top: 20px;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 2px solid #0b0b0b;
     border-radius: 5px;
     background-color: #cd95f7;
 }
@@ -72,3 +71,52 @@ h1 {
     text-align: center;
 }
 
+.extreme-cold {
+    background-color: darkblue;
+    color: white;
+}
+
+.bitter-cold {
+    background-color: steelblue;
+    color: white;
+}
+
+.freezing {
+    background-color: lightblue;
+    color: black;
+}
+
+.cold {
+    background-color: #87CEFA; /* Light Sky Blue */
+    color: black;
+}
+
+.mild {
+    background-color: lightgreen;
+    color: black;
+}
+
+.comfortable {
+    background-color: lightyellow;
+    color: black;
+}
+
+.warm {
+    background-color: yellow;
+    color: black;
+}
+
+.hot {
+    background-color: orange;
+    color: black;
+}
+
+.very-hot {
+    background-color: orangered;
+    color: white;
+}
+
+.extreme-heat {
+    background-color: red;
+    color: white;
+}

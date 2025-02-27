@@ -61,19 +61,22 @@ function guessCurrentCondition(observation) {
 
     if (precipRate > 0) {
         condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Raining";
-    } else if (solarRadiation > 200 && uvIndex > 1) {
+    } else if (solarRadiation > 100 && uvIndex >= 1) {
         condition = "☀️ Sunny";
     } else if (windSpeed > 5) {
         condition = "💨 Windy";
     } else if (solarRadiation <= 0) {
         condition = "🌃 Night";
-    } else if (humidity > 90 && solarRadiation >= 15 && solarRadiation < 100) {
+    } else if (humidity > 85 && solarRadiation >= 30 && solarRadiation < 100) {
+        condition = "🌤️ Hazy";
+    } else if (humidity > 90 && solarRadiation >= 1 && solarRadiation < 30) {
         condition = "☁️ Overcast";
     } else {
-        condition = "🌤️ Clear";
+        condition = "☀️ Daytime";
     }
 
     const temperatureDescriptor = getTemperatureDescriptor(temperature);
+    setBackgroundColor(temperatureDescriptor); // Set background color based on temperature descriptor
     return `${condition} & ${temperatureDescriptor}`;
 }
 
@@ -92,7 +95,43 @@ function getTemperatureDescriptor(temp) {
     return "Unknown";
 }
 
+function setBackgroundColor(descriptor) {
+    const element = document.querySelector('.group.current-condition');
+    element.classList.remove('extreme-cold', 'bitter-cold', 'freezing', 'cold', 'mild', 'comfortable', 'warm', 'hot', 'very-hot', 'extreme-heat');
 
+    switch (descriptor) {
+        case 'Extreme Cold':
+            element.classList.add('extreme-cold');
+            break;
+        case 'Bitter Cold':
+            element.classList.add('bitter-cold');
+            break;
+        case 'Freezing':
+            element.classList.add('freezing');
+            break;
+        case 'Cold':
+            element.classList.add('cold');
+            break;
+        case 'Mild':
+            element.classList.add('mild');
+            break;
+        case 'Comfortable':
+            element.classList.add('comfortable');
+            break;
+        case 'Warm':
+            element.classList.add('warm');
+            break;
+        case 'Hot':
+            element.classList.add('hot');
+            break;
+        case 'Very Hot':
+            element.classList.add('very-hot');
+            break;
+        case 'Extreme Heat':
+            element.classList.add('extreme-heat');
+            break;
+    }
+}
 
 
 document.addEventListener("DOMContentLoaded", () => {
