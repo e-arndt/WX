@@ -77,7 +77,7 @@ function guessCurrentCondition(observation) {
         return "🌃 Night";
     }
 
-    if (humidity > 90 && solarRadiation >= 30 && solarRadiation < 100) {
+    if (humidity > 90 && solarRadiation >= 15 && solarRadiation < 100) {
         return "☁️ Overcast";
     }
 
