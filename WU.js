@@ -16,7 +16,10 @@ async function fetchWeatherData() {
             document.getElementById("wind-speed").textContent = observation.imperial.windSpeed;
             document.getElementById("solar-radiation").textContent = observation.solarRadiation;
             document.getElementById("uv-index").textContent = observation.uv;
-            document.getElementById("wind-dir").textContent = observation.winddir;
+
+            const windDirection = convertDegreesToCardinal(observation.winddir);
+            document.getElementById("wind-dir").textContent = `${observation.winddir}° (${windDirection})`;
+
             document.getElementById("wind-chill").textContent = observation.imperial.windChill;
             document.getElementById("wind-gust").textContent = observation.imperial.windGust;
             document.getElementById("pressure").textContent = observation.imperial.pressure;
@@ -38,6 +41,13 @@ async function fetchWeatherData() {
         console.error('Error fetching data:', error);
     }
 }
+
+function convertDegreesToCardinal(degrees) {
+    const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+    const index = Math.round(degrees / 22.5);
+    return directions[index % 16];
+}
+
 
 function guessCurrentCondition(observation) {
     const temperature = observation.imperial.temp;
