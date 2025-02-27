@@ -132,6 +132,9 @@ function setBackgroundColor(descriptor) {
         case 'Extreme Heat':
             element.classList.add('extreme-heat');
             break;
+        case 'Unknown':
+            element.classList.add('unknown');
+            break;
     }
 }
 

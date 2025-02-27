@@ -120,3 +120,8 @@ h1 {
     background-color: red;
     color: white;
 }
+
+.unknown {
+    background-color: rgb(119, 99, 99);
+    color: white;
+}
