@@ -61,7 +61,7 @@ function guessCurrentCondition(observation) {
 
     if (precipRate > 0) {
         condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Raining";
-    } else if (solarRadiation > 80 && uvIndex > 0 && humidity < 75) {
+    } else if (solarRadiation > 75 && uvIndex > 0 && humidity < 75) {
         condition = "☀️ Sunny";
     } else if (windSpeed > 1) {
         condition = "💨 Breezy";
