@@ -1,4 +1,4 @@
-const apiKey = "032b36ea99f94242ab36ea99f93242eb";
+const { apiKey } = require('./scripts/config');
 const stationId = "KWAFEDER5";
 const baseUrl = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=e&apiKey=${apiKey}`;
 
