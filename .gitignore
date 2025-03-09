@@ -1,5 +1,5 @@
 # .gitignore
 node_modules/
 scripts/config.js
-styles/
+# styles/
 .env

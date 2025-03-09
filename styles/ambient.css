@@ -1,0 +1,41 @@
+body {
+    background-color: #111111; /* Background color of your page */
+    color: #d6dd0a; /* Default text color */
+    font-family: Arial, sans-serif; /* Font style */
+}
+
+
+/* Ambient Weather Styles */
+
+.iframe-container {
+    position: relative;
+    padding-bottom: 80%;
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    height: auto;
+    border: 3px solid #da144c; /* Border color and thickness */
+}
+
+.iframe-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* CSS for the Ambient Weather link */
+.ambient-link {
+    color: #4a90e2; /* Replace with your desired color */
+    font-weight: bold; /* Optional: make the text bold */
+    text-decoration: none; /* Optional: remove underline */
+}
+
+.ambient-link:hover {
+    color: #1fcddd; /* Replace with your desired hover color */
+    text-decoration: underline; /* Optional: underline on hover */
+}
+
+
+/* Additional styling for the powered by link if needed */
