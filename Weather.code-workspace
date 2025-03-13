@@ -1,5 +1,9 @@
 {
-	"folders": [],
+	"folders": [
+		{
+			"path": "."
+		}
+	],
 	"settings": {
 		"liveServer.settings.multiRootWorkspaceName": "WX"
 	}
