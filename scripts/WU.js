@@ -78,7 +78,7 @@ function guessCurrentCondition(observation) {
         condition = "💨 Storm Gust Winds";
     } else if (solarRadiation > 75 && humidity < 80) {
         condition = "☀️ Sunny";
-    } else if (solarRadiation > 275 && uvIndex > 1) {
+    } else if (solarRadiation > 400 && uvIndex > 2) {
         condition = "😎 Bright Sun";
     } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
         condition = "💦😎 Humid";
