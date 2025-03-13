@@ -56,6 +56,7 @@ function guessCurrentCondition(observation) {
     const solarRadiation = observation.solarRadiation;
     const uvIndex = observation.uv;
     const precipRate = observation.imperial.precipRate;
+    const windGust = observation.imperial.windGust;
 
     let condition = "";
 
@@ -63,16 +64,30 @@ function guessCurrentCondition(observation) {
         condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Raining";
     } else if (windSpeed > 1 && windSpeed <= 5) {
         condition = "💨 Breezy";
-    } else if (windSpeed > 5) {
+    } else if (windSpeed > 5 && windSpeed <= 10) {
         condition = "💨 Windy";
-    } else if (solarRadiation > 75 && uvIndex > 0 && humidity < 80) {
+    } else if (windSpeed > 10 && windSpeed <= 17) {
+        condition = "💨 Strong Wind";
+    } else if (windSpeed > 17) {
+        condition = "💨 Storm Winds";
+    } else if (windGust > 5 && windGust <= 10) {
+        condition = "💨 Gusty Wind";
+    } else if (windGust > 10 && windGust <= 15) {
+        condition = "💨 Strong Gusty Wind";
+    } else if (windGust > 15) {
+        condition = "💨 Storm Gust Winds";
+    } else if (solarRadiation > 75 && humidity < 80) {
         condition = "☀️ Sunny";
+    } else if (solarRadiation > 275 && uvIndex > 1) {
+        condition = "😎 Bright Sun";
+    } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
+        condition = "💦😎 Humid";
+    } else if (humidity > 79 && solarRadiation >= 79 && solarRadiation < 201) {
+        condition = "🌤️ Hazy";
+    } else if (humidity > 80 && solarRadiation >= 1 && solarRadiation < 79) {
+        condition = "☁️ Overcast";
     } else if (solarRadiation <= 0) {
         condition = "🌃 Night";
-    } else if (humidity > 79 && solarRadiation >= 75 && solarRadiation < 201) {
-        condition = "🌤️ Hazy";
-    } else if (humidity > 80 && solarRadiation >= 1 && solarRadiation < 75) {
-        condition = "☁️ Overcast";
     } else {
         condition = "☀️ Daytime";
     }
