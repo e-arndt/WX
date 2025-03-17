@@ -60,8 +60,18 @@ function guessCurrentCondition(observation) {
 
     let condition = "";
 
-    if (precipRate > 0) {
-        condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Raining";
+    if (precipRate > 0 && precipRate < .10) {
+        condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Light Rain";
+    } else if (precipRate >= .10 && precipRate < .15) {
+        condition = (temperature <= 33) ? "❄️ Moderate Snow" : "🌧️ Raining";
+    } else if (precipRate >= .15 && precipRate <= .20) {
+        condition = (temperature <= 33) ? "❄️ Heavy Snow" : "🌧️ Moderate Rain";
+    } else if (precipRate >= .20 && precipRate <= .30) {
+        condition = (temperature <= 33) ? "❄️ Heavy Snow" : "🌧️ Heavy Rain";
+    } else if (precipRate >= .30 && precipRate <= .50) {
+        condition = (temperature <= 33) ? "❄️ Blizzard Snow" : "🌧️ Heavy Downpour";
+    } else if (precipRate >= .50) {
+        condition = (temperature <= 33) ? "❄️ Whitout Snow" : "🌧️ Torrential Downpour";
     } else if (windSpeed > 1 && windSpeed <= 5) {
         condition = "💨 Breezy";
     } else if (windSpeed > 5 && windSpeed <= 10) {
@@ -70,15 +80,13 @@ function guessCurrentCondition(observation) {
         condition = "💨 Strong Wind";
     } else if (windSpeed > 17) {
         condition = "💨 Storm Winds";
-    } else if (windGust > 5 && windGust <= 10) {
-        condition = "💨 Gusty Wind";
-    } else if (windGust > 10 && windGust <= 15) {
+    } else if (windGust > 3 && windGust <= 8) {
+        condition = "💨 Gusty";
+    } else if (windGust > 8 && windGust <= 15) {
         condition = "💨 Strong Gusty Wind";
     } else if (windGust > 15) {
         condition = "💨 Storm Gust Winds";
-    } else if (solarRadiation > 75 && humidity < 80) {
-        condition = "☀️ Sunny";
-    } else if (solarRadiation > 400 && uvIndex > 2) {
+    } else if (solarRadiation > 600 && uvIndex > 5) {
         condition = "😎 Bright Sun";
     } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
         condition = "💦😎 Humid";
@@ -86,6 +94,8 @@ function guessCurrentCondition(observation) {
         condition = "🌤️ Hazy";
     } else if (humidity > 80 && solarRadiation >= 1 && solarRadiation < 79) {
         condition = "☁️ Overcast";
+    } else if (solarRadiation > 75 && humidity < 80) {
+        condition = "☀️ Sunny";
     } else if (solarRadiation <= 0) {
         condition = "🌃 Night";
     } else {
