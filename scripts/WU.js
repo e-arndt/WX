@@ -78,20 +78,23 @@ function guessCurrentCondition(observation) {
         condition = (temperature <= 33) ? "❄️ Blizzard Snow" : "🌧️ Heavy Downpour";
     } else if (precipRate >= .50) {
         condition = (temperature <= 33) ? "❄️ Whiteout Snow" : "🌧️ Torrential Downpour";
-    } else if (windSpeed > 1 && windSpeed <= 5) {
-        condition = "💨 Breezy";
+    } else if (windSpeed > 17) {
+        condition = "💨 Storm Winds";
+    } else if (windGust > 15) {
+        condition = "💨 Storm Gust Winds";
+    } else if (windSpeed > 10 && windSpeed <= 17) {
+        condition = "💨 Strong Wind";
+    } else if (windGust > 8 && windGust <= 15) {
+        condition = "💨 Strong Gusty Wind";
     } else if (windGust > 3 && windGust <= 8) {
         condition = "💨 Gusty";
     } else if (windSpeed > 5 && windSpeed <= 10) {
         condition = "💨 Windy";
-    } else if (windGust > 8 && windGust <= 15) {
-        condition = "💨 Strong Gusty Wind";
-    } else if (windSpeed > 10 && windSpeed <= 17) {
-        condition = "💨 Strong Wind";
-    } else if (windGust > 15) {
-        condition = "💨 Storm Gust Winds";
-    } else if (windSpeed > 17) {
-        condition = "💨 Storm Winds";
+    } else if (windSpeed > 1 && windSpeed <= 5) {
+        condition = "💨 Breezy";
+    
+    
+    
     } else if (solarRadiation > 600 && uvIndex > 4) {
         condition = "😎 Bright Sun";
     } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
