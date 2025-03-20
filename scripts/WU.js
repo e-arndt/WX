@@ -66,8 +66,8 @@ function guessCurrentCondition(observation) {
 
     let condition = "";
 
-    if (precipRate > 0 && precipRate < .05) {
-        condition = (temperature <= 33) ? "❄️ Light Snow" : "🌧️ Misting";
+    if (precipRate > 0 && precipRate <= .05) {
+        condition = (temperature <= 33) ? "❄️ Light Snow" : "🌧️ Drizzling";
     } else if (precipRate > .05 && precipRate < .10) {
         condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Light Rain";
     } else if (precipRate >= .10 && precipRate < .15) {
