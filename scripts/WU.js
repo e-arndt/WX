@@ -74,8 +74,10 @@ function guessCurrentCondition(observation) {
         condition = (temperature <= 33) ? "❄️ Heavy Snow" : "🌧️ Moderate Rain";
     } else if (precipRate >= .20 && precipRate <= .30) {
         condition = (temperature <= 33) ? "❄️ Heavy Snow" : "🌧️ Heavy Rain";
-    } else if (precipRate >= .30 && precipRate <= .50) {
-        condition = (temperature <= 33) ? "❄️ Blizzard Snow" : "🌧️ Heavy Downpour";
+    } else if (precipRate >= .30 && precipRate <= .40) {
+        condition = (temperature <= 33) ? "❄️ Blizzard Snow" : "🌧️ Downpour";
+    } else if (precipRate >= .40 && precipRate <= .50) {
+        condition = (temperature <= 33) ? "❄️ Heavy Blizzard Snow" : "🌧️ Heavy Downpour";
     } else if (precipRate >= .50) {
         condition = (temperature <= 33) ? "❄️ Whiteout Snow" : "🌧️ Torrential Downpour";
     } else if (windSpeed > 17) {
