@@ -2,6 +2,8 @@ const apiKey = '032b36ea99f94242ab36ea99f93242eb';
 const stationId = "KWAFEDER5";
 const baseUrl = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=e&apiKey=${apiKey}`;
 
+let updateTimer;
+
 async function fetchWeatherData() {
     try {
         const response = await fetch(baseUrl);
@@ -27,19 +29,23 @@ async function fetchWeatherData() {
             document.getElementById("total-precip").textContent = observation.imperial.precipTotal;
 
             const lastUpdate = new Date(observation.obsTimeLocal);
+            
             document.getElementById("last-update").textContent = lastUpdate.toLocaleString();
             document.getElementById("next-update").textContent = 60; // Next update in 60 seconds
 
+            const currentHour = lastUpdate.getHours(); // Extract the current hour (0-23)
+
             // Call the guessCurrentCondition function and update HTML with the returned condition
-            const currentCondition = guessCurrentCondition(observation);
+            const currentCondition = guessCurrentCondition(observation, currentHour);
             document.getElementById("current-condition").textContent = currentCondition;
 
         } else {
             console.error('Error fetching data:', response.statusText);
         }
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error.message, error.stack);
     }
+    
 }
 
 function convertDegreesToCardinal(degrees) {
@@ -50,10 +56,10 @@ function convertDegreesToCardinal(degrees) {
 
 
 function guessCurrentCondition(observation) {
-    const temperature = observation.imperial.temp;
-    const humidity = observation.humidity;
+    const temperature = observation.imperial.temp || 0; // Default to 0 if undefined
+    const humidity = observation.humidity || 0; // Default to 0 if undefined
     const windSpeed = observation.imperial.windSpeed;
-    const solarRadiation = observation.solarRadiation;
+    const solarRadiation = observation.solarRadiation || 0; // Default to 0 if undefined
     const uvIndex = observation.uv;
     const precipRate = observation.imperial.precipRate;
     const windGust = observation.imperial.windGust;
@@ -71,31 +77,33 @@ function guessCurrentCondition(observation) {
     } else if (precipRate >= .30 && precipRate <= .50) {
         condition = (temperature <= 33) ? "❄️ Blizzard Snow" : "🌧️ Heavy Downpour";
     } else if (precipRate >= .50) {
-        condition = (temperature <= 33) ? "❄️ Whitout Snow" : "🌧️ Torrential Downpour";
+        condition = (temperature <= 33) ? "❄️ Whiteout Snow" : "🌧️ Torrential Downpour";
     } else if (windSpeed > 1 && windSpeed <= 5) {
         condition = "💨 Breezy";
-    } else if (windSpeed > 5 && windSpeed <= 10) {
-        condition = "💨 Windy";
-    } else if (windSpeed > 10 && windSpeed <= 17) {
-        condition = "💨 Strong Wind";
-    } else if (windSpeed > 17) {
-        condition = "💨 Storm Winds";
     } else if (windGust > 3 && windGust <= 8) {
         condition = "💨 Gusty";
+    } else if (windSpeed > 5 && windSpeed <= 10) {
+        condition = "💨 Windy";
     } else if (windGust > 8 && windGust <= 15) {
         condition = "💨 Strong Gusty Wind";
+    } else if (windSpeed > 10 && windSpeed <= 17) {
+        condition = "💨 Strong Wind";
     } else if (windGust > 15) {
         condition = "💨 Storm Gust Winds";
+    } else if (windSpeed > 17) {
+        condition = "💨 Storm Winds";
     } else if (solarRadiation > 600 && uvIndex > 4) {
         condition = "😎 Bright Sun";
     } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
-        condition = "💦😎 Humid";
-    } else if (humidity > 79 && solarRadiation >= 79 && solarRadiation < 201) {
+        condition = "💦😎 Muggy";
+    } else if (humidity > 69 && solarRadiation >= 69 && solarRadiation < 201) {
         condition = "🌤️ Hazy";
-    } else if (humidity > 80 && solarRadiation >= 1 && solarRadiation < 79) {
+    } else if (humidity > 70 && solarRadiation >= 1 && solarRadiation < 69) {
         condition = "☁️ Overcast";
-    } else if (solarRadiation > 75 && humidity < 80) {
+    } else if (solarRadiation > 35 && humidity < 80) {
         condition = "☀️ Sunny";
+    } else if (solarRadiation >= 1 && solarRadiation < 35 && currentHour >=18) {
+        condition = "🌇 Twilight";
     } else if (solarRadiation <= 0) {
         condition = "🌃 Night";
     } else {
@@ -124,7 +132,7 @@ function getTemperatureDescriptor(temp) {
 
 function setBackgroundColor(descriptor) {
     const element = document.querySelector('.group.current-condition');
-    element.classList.remove('extreme-cold', 'bitter-cold', 'freezing', 'cold', 'mild', 'comfortable', 'warm', 'hot', 'very-hot', 'extreme-heat');
+    element.classList.remove('extreme-cold', 'bitter-cold', 'freezing', 'cold', 'cool', 'comfortable', 'warm', 'hot', 'very-hot', 'extreme-heat');
 
     switch (descriptor) {
         case 'Extreme Cold':
@@ -165,13 +173,26 @@ function setBackgroundColor(descriptor) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    fetchWeatherData();
+    fetchWeatherData(); // Fetch weather data immediately when the page loads
+
+    // Periodically fetch weather data every 60 seconds
     setInterval(() => {
         fetchWeatherData();
         document.getElementById("next-update").textContent = 60; // Reset the next update time
-    }, 60000); // Refresh the page every 60,000 milliseconds (1 minute)
-    setInterval(() => {
+        startNextUpdateTimer(); // Restart the countdown timer for the next update
+    }, 60000); // Fetch every 60,000 milliseconds (1 minute)
+
+    // Countdown timer for the next update
+    function startNextUpdateTimer() {
         const nextUpdateElem = document.getElementById("next-update");
-        nextUpdateElem.textContent = Math.max(0, nextUpdateElem.textContent - 1); // Decrement the next update time
-    }, 1000); // Update every 1 second
+        clearInterval(updateTimer); // Clear any previous interval for the timer
+        updateTimer = setInterval(() => {
+            nextUpdateElem.textContent = Math.max(0, nextUpdateElem.textContent - 1); // Decrement the countdown
+        }, 1000); // Update every 1 second
+    }
+
+    // Start the countdown timer immediately
+    document.getElementById("next-update").textContent = 60; // Initialize to 60 seconds
+    startNextUpdateTimer();
 });
+
