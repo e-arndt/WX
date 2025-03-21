@@ -7,9 +7,14 @@ let updateTimer;
 async function fetchWeatherData() {
     try {
         const response = await fetch(baseUrl);
+        console.log("API Response: ", response);
         if (response.ok) {
             const data = await response.json();
+            console.log("Parsed Data: ", data); // Log the parsed JSON data
+            console.log("Observations: ", data.observations);
+
             const observation = data.observations[0];
+            console.log("Observation Object: ", observation); // Log the specific observation data
 
             // Update HTML with observation data
             document.getElementById("station-id").textContent = observation.stationID;
@@ -20,6 +25,7 @@ async function fetchWeatherData() {
             document.getElementById("uv-index").textContent = observation.uv;
 
             const windDirection = convertDegreesToCardinal(observation.winddir);
+            console.log("Wind Direction: ", windDirection); // Log calculated wind direction
             document.getElementById("wind-dir").textContent = `${observation.winddir}° (${windDirection})`;
 
             document.getElementById("wind-chill").textContent = observation.imperial.windChill;
@@ -29,14 +35,18 @@ async function fetchWeatherData() {
             document.getElementById("total-precip").textContent = observation.imperial.precipTotal;
 
             const lastUpdate = new Date(observation.obsTimeLocal);
+            console.log("Last Update Time: ", lastUpdate); // Log the last update time
+            
             
             document.getElementById("last-update").textContent = lastUpdate.toLocaleString();
             document.getElementById("next-update").textContent = 60; // Next update in 60 seconds
 
             const currentHour = lastUpdate.getHours(); // Extract the current hour (0-23)
+            console.log("Current Hour: ", currentHour); // Log current hour extracted from timestamp
 
             // Call the guessCurrentCondition function and update HTML with the returned condition
             const currentCondition = guessCurrentCondition(observation, currentHour);
+            console.log("Current Condition: ", currentCondition); // Log guessed current condition
             document.getElementById("current-condition").textContent = currentCondition;
 
         } else {
@@ -56,13 +66,29 @@ function convertDegreesToCardinal(degrees) {
 
 
 function guessCurrentCondition(observation) {
+    console.log("Observation Passed to guessCurrentCondition: ", observation); // Log observation
+    console.log("Current Hour Passed: ", currentHour); // Log current hour
+
     const temperature = observation.imperial.temp || 0; // Default to 0 if undefined
+    console.log("Temperature: ", temperature); // Log temperature
+    
     const humidity = observation.humidity || 0; // Default to 0 if undefined
+    console.log("Humidity: ", humidity); // Log humidity
+    
     const windSpeed = observation.imperial.windSpeed;
+    console.log("Wind Speed: ", windSpeed); // Log wind speed
+
     const solarRadiation = observation.solarRadiation || 0; // Default to 0 if undefined
+    console.log("Solar Radiation: ", solarRadiation); // Log solar radiation
+    
     const uvIndex = observation.uv;
+    console.log("UV Index: ", uvIndex); // Log UV index
+    
     const precipRate = observation.imperial.precipRate;
+    console.log("Precipitation Rate: ", precipRate); // Log precipitation rate
+    
     const windGust = observation.imperial.windGust;
+    console.log("Wind Gust: ", windGust); // Log wind gust
 
     let condition = "";
 
@@ -133,6 +159,7 @@ function guessCurrentCondition(observation) {
     }
 
     const temperatureDescriptor = getTemperatureDescriptor(temperature);
+    console.log("Temperature Descriptor: ", temperatureDescriptor); // Log temperature descriptor
     setBackgroundColor(temperatureDescriptor); // Set background color based on temperature descriptor
     return `${condition} & ${temperatureDescriptor}`;
 }
