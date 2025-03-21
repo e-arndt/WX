@@ -101,11 +101,11 @@ function guessCurrentCondition(observation) {
     } else if (windSpeed > 10 && windSpeed <= 13) {
         condition = "💨 Very Windy";
     } else if (windGust > 7 && windGust <= 10) {
-        condition = "💨 Very Gusty Winds";
+        condition = "💨 Gusty Winds";
     } else if (windSpeed > 7 && windSpeed <= 10) {
         condition = "💨 Windy";
     } else if (windGust > 5 && windGust <= 7) {
-        condition = "💨 Gusty Wind";
+        condition = "💨 Mild Gust";
     } else if (windGust > 3 && windGust <= 5) {
         condition = "💨 Light Gust";
     } else if (windSpeed > 4 && windSpeed <= 7) {
