@@ -141,7 +141,7 @@ function guessCurrentCondition(observation, currentHour) {
     } else if (windSpeed > 4 && windSpeed <= 7) {
         condition = "💨 Light Wind";
     } else if (windSpeed > 1 && windSpeed <= 4) {
-        condition = "💨 Breezy";
+        condition = "💨 Light Breeze";
     } else if (solarRadiation > 600 && uvIndex > 4) {
         condition = "😎 Bright Sun";
     } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
