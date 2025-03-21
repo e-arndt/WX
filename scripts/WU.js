@@ -36,25 +36,28 @@ async function fetchWeatherData() {
 
             const lastUpdate = new Date(observation.obsTimeLocal);
             console.log("Last Update Time: ", lastUpdate); // Log the last update time
-            
+            const currentHour = lastUpdate.getHours(); // Extract the current hour (0-23)
+            console.log("Current Hour: ", currentHour); // Log current hour extracted from timestamp
             
             document.getElementById("last-update").textContent = lastUpdate.toLocaleString();
             document.getElementById("next-update").textContent = 60; // Next update in 60 seconds
 
-            const currentHour = lastUpdate.getHours(); // Extract the current hour (0-23)
-            console.log("Current Hour: ", currentHour); // Log current hour extracted from timestamp
+            
 
             // Call the guessCurrentCondition function and update HTML with the returned condition
             const currentCondition = guessCurrentCondition(observation, currentHour);
-            console.log("Current Condition: ", currentCondition); // Log guessed current condition
+            console.log("Result of Current Condition: ", currentCondition); // Log the computed condition
             document.getElementById("current-condition").textContent = currentCondition;
 
+
         } else {
-            console.error('Error fetching data:', response.statusText);
+            console.error('Error fetching data from API. Status: ', response.statusText);
         }
     } catch (error) {
-        console.error('Error fetching data:', error.message, error.stack);
+        console.error('Unexpected error occurred during API fetch:', error.message);
+        
     }
+    
     
 }
 
@@ -65,9 +68,10 @@ function convertDegreesToCardinal(degrees) {
 }
 
 
-function guessCurrentCondition(observation) {
-    console.log("Observation Passed to guessCurrentCondition: ", observation); // Log observation
-    console.log("Current Hour Passed: ", currentHour); // Log current hour
+function guessCurrentCondition(observation, currentHour) {
+    console.log("Observation Passed to guessCurrentCondition: ", observation);
+    console.log("Current Hour Passed: ", currentHour); // No more errors
+
 
     const temperature = observation.imperial.temp || 0; // Default to 0 if undefined
     console.log("Temperature: ", temperature); // Log temperature
