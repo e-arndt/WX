@@ -66,19 +66,19 @@ function guessCurrentCondition(observation) {
 
     let condition = "";
 
-    if (precipRate > 0 && precipRate <= .05) {
+    if (precipRate > 0 && precipRate <= .07) {
         condition = (temperature <= 33) ? "❄️ Light Snow" : "🌧️ Drizzling";
-    } else if (precipRate > .05 && precipRate < .10) {
+    } else if (precipRate > .07 && precipRate < .12) {
         condition = (temperature <= 33) ? "❄️ Snowing" : "🌧️ Light Rain";
-    } else if (precipRate >= .10 && precipRate < .15) {
+    } else if (precipRate >= .12 && precipRate < .17) {
         condition = (temperature <= 33) ? "❄️ Moderate Snow" : "🌧️ Raining";
-    } else if (precipRate >= .15 && precipRate <= .20) {
+    } else if (precipRate >= .17 && precipRate <= .23) {
         condition = (temperature <= 33) ? "❄️ Heavy Snow" : "🌧️ Moderate Rain";
-    } else if (precipRate >= .20 && precipRate <= .30) {
+    } else if (precipRate >= .23 && precipRate <= .33) {
         condition = (temperature <= 33) ? "❄️ Very Heavy Snow" : "🌧️ Heavy Rain";
-    } else if (precipRate >= .30 && precipRate <= .40) {
+    } else if (precipRate >= .33 && precipRate <= .43) {
         condition = (temperature <= 33) ? "❄️ Blizzard Snow" : "🌧️ Downpour";
-    } else if (precipRate >= .40 && precipRate <= .50) {
+    } else if (precipRate >= .43 && precipRate <= .50) {
         condition = (temperature <= 33) ? "❄️ Heavy Blizzard Snow" : "🌧️ Heavy Downpour";
     } else if (precipRate >= .50) {
         condition = (temperature <= 33) ? "❄️ Whiteout Snow" : "🌧️ Torrential Downpour";
