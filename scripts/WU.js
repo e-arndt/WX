@@ -82,19 +82,35 @@ function guessCurrentCondition(observation) {
         condition = (temperature <= 33) ? "❄️ Heavy Blizzard Snow" : "🌧️ Heavy Downpour";
     } else if (precipRate >= .50) {
         condition = (temperature <= 33) ? "❄️ Whiteout Snow" : "🌧️ Torrential Downpour";
-    } else if (windSpeed > 17) {
-        condition = "💨 Storm Winds";
-    } else if (windGust > 15) {
+    } else if (windSpeed > 30) {
+        condition = "💨 Gale Force Winds";
+    } else if (windSpeed > 25 && windSpeed <= 30) {
+        condition = "💨 Strong Storm Winds";
+    } else if (windGust > 25) {
+        condition = "💨 Gale Force Gusts";
+    } else if (windSpeed > 17 && windSpeed <= 25) {
+        condition = "💨 Stormy Winds";
+    } else if (windGust > 19 && windGust <= 25) {
+        condition = "💨 Strong Storm Gusts";
+    } else if (windSpeed > 13 && windSpeed <= 17) {
+        condition = "💨 Strong Winds";
+    } else if (windGust > 14 && windGust <= 19) {
         condition = "💨 Storm Gust Winds";
-    } else if (windSpeed > 10 && windSpeed <= 17) {
-        condition = "💨 Strong Wind";
-    } else if (windGust > 8 && windGust <= 15) {
-        condition = "💨 Strong Gusty Wind";
-    } else if (windGust > 3 && windGust <= 8) {
-        condition = "💨 Gusty";
-    } else if (windSpeed > 5 && windSpeed <= 10) {
+    } else if (windGust > 10 && windGust <= 14) {
+        condition = "💨 Strong Gusty Winds";
+    } else if (windSpeed > 10 && windSpeed <= 13) {
+        condition = "💨 Very Windy";
+    } else if (windGust > 7 && windGust <= 10) {
+        condition = "💨 Very Gusty Winds";
+    } else if (windSpeed > 7 && windSpeed <= 10) {
         condition = "💨 Windy";
-    } else if (windSpeed > 1 && windSpeed <= 5) {
+    } else if (windGust > 5 && windGust <= 7) {
+        condition = "💨 Gusty Wind";
+    } else if (windGust > 3 && windGust <= 5) {
+        condition = "💨 Light Gust";
+    } else if (windSpeed > 4 && windSpeed <= 7) {
+        condition = "💨 Light Wind";
+    } else if (windSpeed > 1 && windSpeed <= 4) {
         condition = "💨 Breezy";
     } else if (solarRadiation > 600 && uvIndex > 4) {
         condition = "😎 Bright Sun";
@@ -113,7 +129,7 @@ function guessCurrentCondition(observation) {
     } else if (solarRadiation <= 0 && currentHour >=15) {
         condition = "🌃 Night";
     } else {
-        condition = "☀️ Daytime";
+        condition = "Calm";
     }
 
     const temperatureDescriptor = getTemperatureDescriptor(temperature);
