@@ -152,9 +152,9 @@ function guessCurrentCondition(observation, currentHour) {
         condition = "🌤️ Hazy";
     } else if (humidity > 70 && solarRadiation >= 1 && solarRadiation < 79) {
         condition = "☁️ Overcast";
-    } else if (solarRadiation > 35 && humidity < 80) {
+    } else if (solarRadiation > 135 && humidity < 80) {
         condition = "☀️ Sunny";
-    } else if (solarRadiation >= 1 && solarRadiation < 35 && currentHour >=18) {
+    } else if (solarRadiation >= 1 && solarRadiation < 79 && currentHour >=18) {
         condition = "🌇 Twilight";
     } else if (solarRadiation <= 0 && currentHour >=15) {
         condition = "🌃 Night";
