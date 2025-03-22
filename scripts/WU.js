@@ -158,8 +158,8 @@ function guessCurrentCondition(observation, currentHour) {
         condition = "☀️ Sunny";
     } else if (solarRadiation > 0 && solarRadiation < 79 && currentHour >=18) {
         condition = "🌇 Twilight";
-    } else if (solarRadiation <= 0 && currentHour >=15) {
-        condition = "🌃 Night";
+    } else if (solarRadiation <= 0 && (currentHour >= 15 || currentHour < 6)) {
+        condition = "🌃 Night";    
     } else {
         condition = "Calm";
     }
