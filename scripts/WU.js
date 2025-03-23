@@ -96,24 +96,28 @@ function guessCurrentCondition(observation, currentHour) {
 
     let condition = "";
 
-    if (precipRate > 0 && precipRate <= .07) {
-        condition = (temperature <= 33) ? "❄️ Light Snow" : "🌧️ Drizzling";
-    } else if (precipRate > .07 && precipRate <= .15) {
+    if (precipRate > 0 && precipRate <= .03) {
+        condition = (temperature <= 33) ? "❄️ Light Snow" : "🌧️ Misting";
+    } else if (precipRate > .03 && precipRate <= .06) {
+        condition = (temperature <= 33) ? "❄️ Snowfall" : "🌧️ Drizzling";
+    } else if (precipRate > .06 && precipRate <= .10) {
         condition = (temperature <= 33) ? "❄️ Snowfall" : "🌧️ Light Rain";
-    } else if (precipRate > .15 && precipRate <= .25) {
+    } else if (precipRate > .10 && precipRate <= .20) {
         condition = (temperature <= 33) ? "❄️ Moderate Snow" : "🌧️ Raining";
-    } else if (precipRate > .25 && precipRate <= .35) {
+    } else if (precipRate > .20 && precipRate <= .30) {
         condition = (temperature <= 33) ? "❄️ Heavy Snow" : "🌧️ Moderate Rain";
-    } else if (precipRate > .35 && precipRate <= .45) {
+    } else if (precipRate > .30 && precipRate <= .40) {
         condition = (temperature <= 33) ? "❄️ Very Heavy Snow" : "🌧️ Heavy Rain";
-    } else if (precipRate > .45 && precipRate <= .55) {
+    } else if (precipRate > .40 && precipRate <= .50) {
         condition = (temperature <= 33) ? "❄️ Near Blizzard Snow" : "🌧️ Very Heavy Rain";
-    } else if (precipRate > .55 && precipRate <= .65) {
+    } else if (precipRate > .50 && precipRate <= .60) {
         condition = (temperature <= 33) ? "❄️ Blizzard Snow" : "🌧️ Downpour";
-    } else if (precipRate > .65 && precipRate <= .75) {
+    } else if (precipRate > .60 && precipRate <= .70) {
         condition = (temperature <= 33) ? "❄️ Heavy Blizzard Snow" : "🌧️ Heavy Downpour";
-    } else if (precipRate > .75) {
-        condition = (temperature <= 33) ? "❄️ Whiteout Snow" : "🌧️ Torrential Downpour";
+    } else if (precipRate > .70 && precipRate <= .80) {
+        condition = (temperature <= 33) ? "❄️ Heavy Blizzard Snow" : "🌧️ Torrential Downpour";
+    } else if (precipRate > .80) {
+        condition = (temperature <= 33) ? "❄️ Whiteout Snow" : "🌧️ Heavy Torrential Downpour";
     } else if (windSpeed > 30) {
         condition = "💨 Gale Force Winds";
     } else if (windSpeed > 25 && windSpeed <= 30) {
