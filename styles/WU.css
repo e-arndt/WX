@@ -1,7 +1,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 10px;
     background-color: rgb(79, 14, 14);
     font-size: 1.35rem;
 }
@@ -23,7 +23,7 @@ h1 {
     margin-bottom: 10px;
     padding: 5px;
     border-radius: 5px;
-    padding-left: 25px;
+    padding-left: 15px;
     border: 2px solid #0b0b0b;
 }
 
