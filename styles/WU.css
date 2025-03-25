@@ -56,6 +56,7 @@ h1 {
     color: #000000; 
     text-align: center;
     font-size: 2rem;
+    transition: background-color 2s ease-in-out;
 }
 
 .update-info {
