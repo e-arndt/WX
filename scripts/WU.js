@@ -172,7 +172,7 @@ function guessCurrentCondition(observation, currentHour) {
     } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 7)) {
         condition = "🌃 Night";    
     } else {
-        condition = "Calm";
+        condition = "😌 Calm";
     }
 
     const temperatureDescriptor = getTemperatureDescriptor(temperature);
