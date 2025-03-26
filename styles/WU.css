@@ -130,3 +130,27 @@ h1 {
     background-color: rgb(119, 99, 99);
     color: white;
 }
+
+
+@media (max-width: 750px) {
+
+    body {
+        font-size: 1.1rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem !important; /* Add !important to ensure it applies */
+    }
+
+    .group.current-condition {
+        font-size: 1.25rem; /* Font size for the general content */
+    }
+    
+    .group.current-condition .group-title { 
+        font-size: 1.5rem; /* Font size for the header specifically */
+    }
+    
+
+
+}
+
