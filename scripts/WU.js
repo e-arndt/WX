@@ -189,7 +189,7 @@ function getTemperatureDescriptor(temp) {
     if (temp >= 25 && temp < 34) return "Freezing";
     if (temp >= 34 && temp < 55) return "Cold";
     if (temp >= 55 && temp < 65) return "Cool";
-    if (temp >= 65 && temp < 75) return "Comfortable";
+    if (temp >= 65 && temp < 75) return "Mild";
     if (temp >= 75 && temp < 82) return "Warm";
     if (temp >= 82 && temp < 90) return "Hot";
     if (temp >= 90 && temp < 96) return "Very Hot";
@@ -200,7 +200,7 @@ function getTemperatureDescriptor(temp) {
 
 function setBackgroundColor(descriptor) {
     const element = document.querySelector('.group.current-condition');
-    element.classList.remove('extreme-cold', 'bitter-cold', 'freezing', 'cold', 'cool', 'comfortable', 'warm', 'hot', 'very-hot', 'extreme-heat');
+    element.classList.remove('extreme-cold', 'bitter-cold', 'freezing', 'cold', 'cool', 'mild', 'warm', 'hot', 'very-hot', 'extreme-heat');
 
     switch (descriptor) {
         case 'Extreme Cold':
@@ -218,8 +218,8 @@ function setBackgroundColor(descriptor) {
         case 'Cool':
             element.classList.add('cool');
             break;
-        case 'Comfortable':
-            element.classList.add('comfortable');
+        case 'Mild':
+            element.classList.add('mild');
             break;
         case 'Warm':
             element.classList.add('warm');
