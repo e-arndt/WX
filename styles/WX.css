@@ -1,0 +1,156 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 10px;
+    background-color: rgb(79, 14, 14);
+    font-size: 1.35rem;
+}
+
+h1 {
+    color: rgb(255, 230, 45);
+    text-align: center;
+    margin-top: -7px;
+    margin-bottom: 5px;
+}
+
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.group {
+    flex: 1 1 calc(33% - 45px);
+    padding: 5px;
+    border-radius: 5px;
+    padding-left: 15px;
+    border: 2px solid #0b0b0b;
+}
+
+.group-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.temp-humidity-windchill {
+    background-color: #7fe16e;
+}
+
+.wind-speed-gust-direction {
+    background-color: #8fd6f6;
+}
+
+.solar-uv {
+    background-color: #f5c47a;
+}
+
+.pressure {
+    background-color: #f7acf7;
+}
+
+.precip-rate {
+    background-color: #f5adad;
+}
+
+.group.current-condition { 
+    color: #000000; 
+    text-align: center;
+    font-size: 2rem;
+    transition: background-color 2s ease-in-out;
+}
+
+#current-condition  {
+    margin-right: 50px;
+}
+
+.update-info {
+    margin-top: 10px;
+    padding: 5px;
+    border: 2px solid #0b0b0b;
+    border-radius: 5px;
+    background-color: #cd95f7;
+}
+
+.center {
+    text-align: center;
+}
+
+.extreme-cold {
+    background-color: darkblue;
+    color: white;
+}
+
+.bitter-cold {
+    background-color: steelblue;
+    color: white;
+}
+
+.freezing {
+    background-color: lightblue;
+    color: black;
+}
+
+.cold {
+    background-color: #87CEFA; /* Light Sky Blue */
+    color: black;
+}
+
+.cool {
+    background-color: lightgreen;
+    color: black;
+}
+
+.comfortable {
+    background-color: lightyellow;
+    color: black;
+}
+
+.warm {
+    background-color: yellow;
+    color: black;
+}
+
+.hot {
+    background-color: orange;
+    color: black;
+}
+
+.very-hot {
+    background-color: orangered;
+    color: white;
+}
+
+.extreme-heat {
+    background-color: red;
+    color: white;
+}
+
+.unknown {
+    background-color: rgb(119, 99, 99);
+    color: white;
+}
+
+
+@media (max-width: 750px) {
+
+    body {
+        font-size: 1.1rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem !important; /* Add !important to ensure it applies */
+    }
+
+    .group.current-condition {
+        font-size: 1.25rem; /* Font size for the general content */
+    }
+    
+    .group.current-condition .group-title { 
+        font-size: 1.5rem; /* Font size for the header specifically */
+    }
+    
+
+
+}
+
