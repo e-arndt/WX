@@ -200,6 +200,13 @@ function getTemperatureDescriptor(temp) {
 
 function setBackgroundColor(descriptor) {
     const element = document.querySelector('.group.current-condition');
+
+    if (!element) {
+        console.error("Element '.group.current-condition' not found");
+        return;
+    }
+    console.log("Applied classes:", element.classList);
+
     element.classList.remove('extreme-cold', 'bitter-cold', 'freezing', 'cold', 'cool', 'mild', 'warm', 'hot', 'very-hot', 'extreme-heat');
 
     switch (descriptor) {
@@ -235,6 +242,9 @@ function setBackgroundColor(descriptor) {
             break;
         case 'Unknown':
             element.classList.add('unknown');
+            break;
+        default:
+            element.classList.add('default-condition'); // Fallback to gray background
             break;
     }
 }

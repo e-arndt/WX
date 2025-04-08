@@ -61,6 +61,10 @@ h1 {
     transition: background-color 2s ease-in-out;
 }
 
+.group.current-condition.default-condition { 
+    background-color: gray; /* Default gray background */
+}
+
 #current-condition  {
     margin-right: 75px;
 }
@@ -77,57 +81,57 @@ h1 {
     text-align: center;
 }
 
-.extreme-cold {
+.group.current-condition.extreme-cold {
     background-color: darkblue;
     color: white;
 }
 
-.bitter-cold {
+.group.current-condition.bitter-cold {
     background-color: steelblue;
     color: white;
 }
 
-.freezing {
+.group.current-condition.freezing {
     background-color: lightblue;
     color: black;
 }
 
-.cold {
+.group.current-condition.cold {
     background-color: #87CEFA; /* Light Sky Blue */
     color: black;
 }
 
-.cool {
+.group.current-condition.cool {
     background-color: lightgreen;
     color: black;
 }
 
-.comfortable {
+.group.current-condition.comfortable {
     background-color: lightyellow;
     color: black;
 }
 
-.warm {
+.group.current-condition.warm {
     background-color: yellow;
     color: black;
 }
 
-.hot {
+.group.current-condition.hot {
     background-color: orange;
     color: black;
 }
 
-.very-hot {
+.group.current-condition.very-hot {
     background-color: orangered;
     color: white;
 }
 
-.extreme-heat {
+.group.current-condition.extreme-heat {
     background-color: red;
     color: white;
 }
 
-.unknown {
+.group.current-condition.unknown {
     background-color: rgb(119, 99, 99);
     color: white;
 }
