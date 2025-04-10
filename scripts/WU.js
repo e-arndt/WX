@@ -16,15 +16,20 @@ async function fetchWeatherData() {
             const observation = data.observations[0];
             console.log("Observation Object: ", observation); // Log the specific observation data
 
-            // Calculate dew point using the simplified formula
-            let dewPoint = observation.imperial.temp - ((100 - observation.humidity) / 5);
-            console.log("Dew Point: ", dewPoint); // Log the calculated dew point
+            const dewPoint = calculateDewPoint(observation.imperial.temp, observation.humidity);
+            if (dewPoint !== null) {
+                console.log("Calculated Dew Point: ", dewPoint.toFixed(1));
+                document.getElementById("dew-point").textContent = dewPoint.toFixed(1);
+}           else {
+                document.getElementById("dew-point").textContent = "N/A"; // Handle missing data gracefully
+}
+
 
             // Update HTML with observation data
             document.getElementById("station-id").textContent = observation.stationID;
             document.getElementById("temperature").textContent = observation.imperial.temp;
             document.getElementById("humidity").textContent = observation.humidity;
-            document.getElementById("dew-point").textContent = dewPoint.toFixed(1);
+            
             document.getElementById("wind-speed").textContent = observation.imperial.windSpeed;
             document.getElementById("solar-radiation").textContent = observation.solarRadiation;
             document.getElementById("uv-index").textContent = observation.uv;
@@ -73,6 +78,16 @@ function convertDegreesToCardinal(degrees) {
 }
 
 
+// Function to calculate dew point
+function calculateDewPoint(temperature, humidity) {
+    if (!temperature || !humidity) {
+        console.warn("Missing temperature or humidity for dew point calculation.");
+        return null;
+    }
+    return temperature - ((100 - humidity) / 5);
+}
+
+
 function guessCurrentCondition(observation, currentHour) {
     console.log("Observation Passed to guessCurrentCondition: ", observation);
     console.log("Current Hour Passed: ", currentHour); // No more errors
@@ -99,7 +114,6 @@ function guessCurrentCondition(observation, currentHour) {
     const windGust = observation.imperial.windGust;
     console.log("Wind Gust: ", windGust); // Log wind gust
 
-    let dewPoint = temperature - ((100-humidity) / 5);
 
     let condition = "";
 
