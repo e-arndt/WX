@@ -78,14 +78,35 @@ function convertDegreesToCardinal(degrees) {
 }
 
 
-// Function to calculate dew point
-function calculateDewPoint(temperature, humidity) {
-    if (!temperature || !humidity) {
-        console.warn("Missing temperature or humidity for dew point calculation.");
+function calculateDewPoint(temperature, humidity, pressureInHg = 29.92) {
+    if (!temperature || !humidity || !pressureInHg) {
+        console.warn("Missing temperature, humidity, or pressure for dew point calculation.");
         return null;
     }
-    return temperature - ((100 - humidity) / 5);
+
+    // Convert temperature from Fahrenheit to Celsius
+    const tempCelsius = (temperature - 32) / 1.8;
+
+    // Convert pressure from inHg to hPa
+    const pressureHpa = pressureInHg * 33.8639;
+
+    // Calculate saturation vapor pressure (e_s) in hPa
+    const e_s = 6.112 * Math.exp((17.67 * tempCelsius) / (tempCelsius + 243.5)) * (pressureHpa / 1013.25);
+
+    // Calculate actual vapor pressure (e)
+    const e = e_s * (humidity / 100);
+
+    // Calculate dew point in Celsius
+    const dewPointCelsius = (243.5 * Math.log(e / 6.112)) / (17.67 - Math.log(e / 6.112));
+
+    // Convert dew point back to Fahrenheit
+    const dewPointFahrenheit = (dewPointCelsius * 1.8) + 32;
+
+    return dewPointFahrenheit; // Return dew point in Fahrenheit
 }
+
+
+
 
 
 function guessCurrentCondition(observation, currentHour) {
