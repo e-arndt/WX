@@ -49,6 +49,9 @@ async function fetchWeatherData() {
 
           // Calculate dew point using enhanced function
           const dewPoint = calculateDewPoint(temperature, humidity, pressure);
+          // Convert the value from Klux to Lux and format it with commas
+          const solarRadiationValue = (observation.solarradiation * 100).toFixed(0); // Convert Klux to Lux
+          const formattedValue = solarRadiationValue.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas
 
           // Update DOM elements for station data
           document.getElementById("station-id").textContent = stationName;
@@ -58,8 +61,8 @@ async function fetchWeatherData() {
           document.getElementById("pressure").textContent = pressure.toFixed(2); // Pressure in inHg
           document.getElementById("wind-speed").textContent = observation.windspeedmph.toFixed(1); // Wind Speed in mph
           document.getElementById("wind-gust").textContent = observation.windgustmph.toFixed(1); // Wind Gust in mph
-          document.getElementById("solar-radiation").textContent = observation.solarradiation.toFixed(2); // Solar Radiation
-          document.getElementById("uv-index").textContent = observation.uv.toFixed(1); // UV Index
+          document.getElementById("solar-radiation").textContent = `${formattedValue}`; // Solar Radiation
+          document.getElementById("uv-index").textContent = observation.uv.toFixed(0); // UV Index
 
           const windChill = getWindChillOrDefault(observation);
           document.getElementById("wind-chill").textContent = `${windChill}`; // Wind Chill in Fahrenheit
@@ -232,19 +235,20 @@ function guessCurrentCondition(observation, currentHour) {
 
   const windCondition = windCheck(windSpeed, windGust);
   if (windCondition && windCondition !== false) { // Ensure valid wind condition
-      const windSeverityMap = {
-          "💨 Light Breeze": 10,
-          "💨 Light Wind": 20,
-          "💨 Mild Gust": 30,
-          "💨 Gusty Winds": 40,
-          "💨 Strong Gusty Winds": 50,
-          "💨 Storm Gust Winds": 60,
-          "💨 Strong Winds": 70,
-          "💨 Stormy Winds": 80,
-          "💨 Strong Storm Winds": 90,
-          "💨 Gale Force Winds": 100,
-          "💨 Gale Force Gusts": 110
-      };
+    const windSeverityMap = {
+        "💨 Light Breeze": 10,
+        "💨 Light Wind": 20,
+        "💨 Light Gust": 25,
+        "💨 Mild Gust": 30,
+        "💨 Gusty Winds": 40,
+        "💨 Strong Gusty Winds": 50,
+        "💨 Storm Gust Winds": 60,
+        "💨 Strong Winds": 70,
+        "💨 Stormy Winds": 80,
+        "💨 Strong Storm Winds": 90,
+        "💨 Gale Force Winds": 100,
+        "💨 Gale Force Gusts": 110
+    };
       const severity = windSeverityMap[windCondition] || 0;
       console.log("Adding Wind Condition: ", { condition: windCondition, severity: windSeverityMap[windCondition] || 0 });
       conditions.push({ condition: windCondition, severity });
