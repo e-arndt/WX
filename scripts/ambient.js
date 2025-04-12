@@ -1,77 +1,118 @@
-const apiKey = '032b36ea99f94242ab36ea99f93242eb';
-const stationId = "KWAFEDER5";
-const baseUrl = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=e&apiKey=${apiKey}`;
+const stationName = "1 Mile SW of Decatur HS";
+const appKey = '46683753c1254679ba68ccbd271fd21ee6cb02a2e6894cb0825d09078559c77c'; // Original application key
+const personalKey = '741a7e0d855944c2b1bea7bca12535dffcf0a73c208144838c8d1c2cee196370'; // Personal key
+const deviceId = 'BC:DD:C2:AF:1D:BB'; // Replace with your device ID
+const baseUrl = `https://api.ambientweather.net/v1/devices/${deviceId}?applicationKey=${appKey}&apiKey=${personalKey}`;
+
+let lastUpdateTime = null; // To track the last update time
+let checkingEveryMinute = false; // Flag to switch schedules
 
 let updateTimer;
 
-// Define calculateDewPoint globally
-function calculateDewPoint(temperature, humidity) {
-    return temperature - ((100 - humidity) / 5); // Simplified formula
+function calculateDewPoint(temperature, humidity, pressureInHg = 29.92) {
+  if (isNaN(temperature) || isNaN(humidity) || isNaN(pressureInHg)) {
+      console.warn("Invalid inputs for dew point calculation:", { temperature, humidity, pressureInHg });
+      return null; // Safeguard against invalid inputs
+  }
+
+  const tempCelsius = (temperature - 32) / 1.8;
+  const pressureHpa = pressureInHg * 33.8639;
+  const e_s = 6.112 * Math.exp((17.67 * tempCelsius) / (tempCelsius + 243.5)) * (pressureHpa / 1013.25);
+  const e = e_s * (humidity / 100);
+  const dewPointCelsius = (243.5 * Math.log(e / 6.112)) / (17.67 - Math.log(e / 6.112));
+  const dewPointFahrenheit = (dewPointCelsius * 1.8) + 32;
+
+  return Number(dewPointFahrenheit.toFixed(1)); // Ensure output is a valid number
 }
+
+
 
 
 async function fetchWeatherData() {
-    try {
-        const response = await fetch(baseUrl);
-        console.log("API Response: ", response);
-        if (response.ok) {
-            const data = await response.json();
-            console.log("Parsed Data: ", data); // Log the parsed JSON data
-            console.log("Observations: ", data.observations);
+  try {
+      const response = await fetch(baseUrl);
+      console.log("API Response: ", response);
 
-            const observation = data.observations[0];
-            console.log("Observation Object: ", observation); // Log the specific observation data
+      if (response.ok) {
+          const data = await response.json();
+          console.log("Parsed Data: ", data);
 
-            const dewPoint = calculateDewPoint(observation.imperial.temp, observation.humidity);
+          // Extract observation object
+          const observation = data[0];
+          console.log("Observation Object: ", observation);
 
-
-            // Update HTML with observation data
-            document.getElementById("station-id").textContent = observation.stationID;
-            document.getElementById("temperature").textContent = observation.imperial.temp;
-            document.getElementById("humidity").textContent = observation.humidity;
-            document.getElementById("dew-point").textContent = dewPoint.toFixed(1);
-            document.getElementById("wind-speed").textContent = observation.imperial.windSpeed;
-            document.getElementById("solar-radiation").textContent = observation.solarRadiation;
-            document.getElementById("uv-index").textContent = observation.uv;
-
-            const windDirection = convertDegreesToCardinal(observation.winddir);
-            console.log("Wind Direction: ", windDirection); // Log calculated wind direction
-            document.getElementById("wind-dir").textContent = `${observation.winddir}° (${windDirection})`;
-
-            document.getElementById("wind-chill").textContent = observation.imperial.windChill;
-            document.getElementById("wind-gust").textContent = observation.imperial.windGust;
-            document.getElementById("pressure").textContent = observation.imperial.pressure;
-            document.getElementById("precip-rate").textContent = observation.imperial.precipRate;
-            document.getElementById("total-precip").textContent = observation.imperial.precipTotal;
-
-            const lastUpdate = new Date(observation.obsTimeLocal);
-            console.log("Last Update Time: ", lastUpdate); // Log the last update time
-            const currentHour = lastUpdate.getHours(); // Extract the current hour (0-23)
-            console.log("Current Hour: ", currentHour); // Log current hour extracted from timestamp
-            
-            document.getElementById("last-update").textContent = lastUpdate.toLocaleString();
-            document.getElementById("next-update").textContent = 60; // Next update in 60 seconds
-
-            
-
-            // Call the guessCurrentCondition function and update HTML with the returned condition
-            const currentCondition = guessCurrentCondition(observation, currentHour);
-            console.log("Result of Current Condition: ", currentCondition); // Log the computed condition
-            document.getElementById("current-condition").textContent = currentCondition;
-            
+          // Extract required variables
+          const temperature = observation.tempf;
+          const humidity = observation.humidity;
+          const pressure = observation.baromrelin; // Ambient API pressure in inHg
 
 
+          // Calculate dew point using enhanced function
+          const dewPoint = calculateDewPoint(temperature, humidity, pressure);
 
-        } else {
-            console.error('Error fetching data from API. Status: ', response.statusText);
-        }
-    } catch (error) {
-        console.error('Unexpected error occurred during API fetch:', error.message);
-        
-    }
-    
-    
+          // Update DOM elements for station data
+          document.getElementById("station-id").textContent = stationName;
+          document.getElementById("temperature").textContent = temperature.toFixed(1); // Temperature in Fahrenheit
+          document.getElementById("humidity").textContent = humidity.toFixed(1); // Relative Humidity percentage
+          document.getElementById("dew-point").textContent = dewPoint; // Dew point in Fahrenheit
+          document.getElementById("pressure").textContent = pressure.toFixed(2); // Pressure in inHg
+          document.getElementById("wind-speed").textContent = observation.windspeedmph.toFixed(1); // Wind Speed in mph
+          document.getElementById("wind-gust").textContent = observation.windgustmph.toFixed(1); // Wind Gust in mph
+          document.getElementById("solar-radiation").textContent = observation.solarradiation.toFixed(1); // Solar Radiation
+          document.getElementById("uv-index").textContent = observation.uv.toFixed(1); // UV Index
+
+          const windChill = getWindChillOrDefault(observation);
+          document.getElementById("wind-chill").textContent = `${windChill}`; // Wind Chill in Fahrenheit
+          
+          const windDirection = convertDegreesToCardinal(observation.winddir);
+          document.getElementById("wind-dir").textContent = `${observation.winddir}° (${windDirection})`;
+
+          document.getElementById("precip-rate").textContent = observation.hourlyrainin.toFixed(2); // Hourly precipitation rate
+          document.getElementById("total-precip").textContent = observation.dailyrainin.toFixed(2); // Total daily precipitation
+
+          // Update last update time
+          const lastUpdate = observation.dateutc ? new Date(parseInt(observation.dateutc)) : null;
+          if (!lastUpdate) {
+              console.error("dateutc is missing or invalid in the observation");
+              return;
+          }
+          console.log("Last Update Time: ", lastUpdate);
+
+          if (observation.dateutc !== lastUpdateTime) {
+              lastUpdateTime = observation.dateutc; // Update the new update time
+              document.getElementById("last-update").textContent = lastUpdate.toLocaleString();
+              checkingEveryMinute = false; // Switch back to 5-minute schedule
+          } else {
+              console.log("Data hasn't changed. Switching to 1-minute schedule.");
+              if (!checkingEveryMinute) {
+                  checkingEveryMinute = true; // Activate 1-minute schedule
+                  startCheckingEveryMinute(); // Switch schedules
+              }
+              return; // Skip UI update if data hasn't changed
+          }
+
+          // Update "Current Condition"
+          const currentHour = new Date().getHours();
+          const currentCondition = guessCurrentCondition(observation, currentHour);
+          console.log("Current Condition: ", currentCondition);
+
+          const currentConditionElem = document.getElementById("current-condition");
+          if (currentConditionElem) {
+              currentConditionElem.textContent = currentCondition;
+          } else {
+              console.warn("Element with ID 'current-condition' is missing!");
+          }
+
+          
+      } else {
+          console.error("Error fetching API data:", response.statusText);
+      }
+  } catch (error) {
+      console.error("Unexpected error occurred during API fetch:", error.message);
+  }
 }
+
+
 
 
 
@@ -82,281 +123,324 @@ function convertDegreesToCardinal(degrees) {
     return directions[index % 16];
 }
 
+
+function getWindChillOrDefault(observation) {
+  const temperature = observation.tempf;
+  const windSpeed = observation.windspeedmph;
+
+  // Check if wind chill is provided by the API
+  const windChillFromApi = observation.windchillf;
+
+  if (temperature > 50) {
+      // Default to actual temperature when above 50°F
+      return temperature.toFixed(1);
+  }
+
+  if (windChillFromApi !== undefined) {
+      // Use wind chill from the API if it exists
+      return windChillFromApi.toFixed(1);
+  }
+
+  if (windSpeed > 3.0) {
+      // Calculate wind chill if conditions apply
+      return calculateWindChill(temperature, windSpeed);
+  }
+
+  // Default to temperature if wind speed is too low
+  return temperature.toFixed(1);
+}
+
+function calculateWindChill(tempF, windSpeedMph) {
+  // Wind chill calculation only applies if wind speed > 3 mph
+  if (tempF <= 50 && windSpeedMph > 3.0) {
+      return (
+          35.74 +
+          (0.6215 * tempF) -
+          (35.75 * Math.pow(windSpeedMph, 0.16)) +
+          (0.4275 * tempF * Math.pow(windSpeedMph, 0.16))
+      ).toFixed(1);
+  }
+  return tempF.toFixed(1); // Default to actual temperature
+}
+
+
 // Poll weather function to determine and return a guess of current weather conditions
 function guessCurrentCondition(observation, currentHour) {
-    let conditions = [];
-    console.log("Observation Passed to guessCurrentCondition: ", observation);
-    console.log("Current Hour Passed: ", currentHour);
+  let conditions = [];
+  console.log("Observation Passed to guessCurrentCondition: ", observation);
+  console.log("Current Hour Passed: ", currentHour);
 
-    // Extract observation values with appropriate defaults
-    const temperature = observation.imperial?.temp !== undefined ? observation.imperial.temp : null; // Use null for undefined temperature
-    const humidity = observation.humidity !== undefined ? observation.humidity : null; // Use null for undefined humidity
-    const windSpeed = observation.imperial?.windSpeed !== undefined ? observation.imperial.windSpeed : 0; // Default to 0 (no wind)
-    const windGust = observation.imperial?.windGust !== undefined ? observation.imperial.windGust : 0; // Default to 0 (no gusts)
-    const solarRadiation = observation.solarRadiation !== undefined ? observation.solarRadiation : 0; // Default to 0
-    const uvIndex = observation.uv !== undefined ? observation.uv : null; // Use null for undefined UV
-    const precipRate = observation.imperial?.precipRate !== undefined ? observation.imperial.precipRate : 0; // Default to 0 (no precipitation)
+  // Extract observation values
+  const temperature = observation.tempf !== undefined ? observation.tempf : null;
+  const humidity = observation.humidity !== undefined ? observation.humidity : null;
+  const windSpeed = observation.windspeedmph !== undefined ? observation.windspeedmph : 0;
+  const windGust = observation.windgustmph !== undefined ? observation.windgustmph : 0;
+  const solarRadiation = observation.solarradiation !== undefined ? observation.solarradiation : 0;
+  const uvIndex = observation.uv !== undefined ? observation.uv : null;
+  const precipRate = observation.hourlyrainin !== undefined ? observation.hourlyrainin : 0;
 
-    
-    // Log to api data console for error resolution
-    console.log("Temperature: ", temperature);
-    console.log("Humidity: ", humidity);
-    console.log("Wind Speed: ", windSpeed);
-    console.log("Wind Gust: ", windGust);
-    console.log("Solar Radiation: ", solarRadiation);
-    console.log("UV Index: ", uvIndex);
-    console.log("Precipitation Rate: ", precipRate);
+  // Log key values for debugging
+  console.log("Temperature: ", temperature);
+  console.log("Humidity: ", humidity);
+  console.log("Wind Speed: ", windSpeed);
+  console.log("Wind Gust: ", windGust);
+  
+  console.log("Solar Radiation: ", solarRadiation);
+  console.log("UV Index: ", uvIndex);
+  console.log("Precipitation Rate: ", precipRate);
 
-    // Get dew point
-    const dewPoint = calculateDewPoint(temperature, humidity);
-    console.log(`Dew Point: ${dewPoint.toFixed(1)}°F`);
-
-    // Check for conditions
-    const snowResult = snowCheck(temperature, dewPoint, humidity);
-    const rainCondition = precipCondition(temperature, precipRate);
-    const windCondition = windCheck(windSpeed, windGust);
-    const solarCondition = solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour);
-
-    // log condition function returns for error resolution
-    console.log(`Snow Condition: ${snowResult[0] ? "Possible" : "Not Possible"}, Chance: ${snowResult[1]}%`);
-    console.log("Rain Condition: ", rainCondition || "None");
-    console.log("Wind Condition: ", windCondition || "None");
-    console.log("Solar Condition: ", solarCondition || "None");
-    
-
-    // Snow severity
-    if (snowResult[0]) {
-        conditions.push({ condition: `❄️ ${snowResult[1]}%`, severity: snowResult[1] });
+  // Get dew point
+  console.log("Temperature: ", temperature);
+  console.log("Humidity: ", humidity);
+  console.log("Pressure (defaulting to 29.92): ", 29.92);
+  const dewPoint = calculateDewPoint(temperature, humidity);
+  console.log("Dew Point Result: ", dewPoint);
+    if (typeof dewPoint === "number") {
+        console.log(`Dew Point: ${dewPoint.toFixed(1)}°F`);
+    } else {
+        console.warn("Dew Point calculation returned an invalid value.");
+        console.log("Dew Point: N/A");
     }
 
-    // Rain severity (mapped to values like "Light Rain" -> low severity, "Heavy Rain" -> high severity)
-    if (rainCondition) {
-        const rainSeverityMap = {
-            "🌧️ Misting": 10,
-            "🌧️ Drizzling": 20,
-            "🌧️ Light Rain": 30,
-            "🌧️ Raining": 40,
-            "🌧️ Moderate Rain": 50,
-            "🌧️ Heavy Rain": 60,
-            "🌧️ Very Heavy Rain": 70,
-            "🌧️ Downpour": 80,
-            "🌧️ Heavy Downpour": 90,
-            "🌧️ Torrential Downpour": 100,
-            "🌧️ Heavy Torrential Downpour": 110,
-            "🌧️ Extreme Torrential Downpour": 120
-        };
-        const severity = rainSeverityMap[rainCondition] || 0;
-        conditions.push({ condition: rainCondition, severity });
-    }
+  // Check for conditions
+  const snowResult = snowCheck(observation);
+  if (snowResult[0]) { // Ensure snow is possible before adding
+      console.log("Adding Snow Condition: ", { condition: `❄️ Snow (${snowResult[1]}%)`, severity: snowResult[1] });
+      conditions.push({ condition: `❄️ Snow (${snowResult[1]}%)`, severity: snowResult[1] });
+  }
 
-    // Wind severity (mapped to values based on intensity)
-    if (windCondition) {
-        const windSeverityMap = {
-            "💨 Light Breeze": 10,
-            "💨 Light Wind": 20,
-            "💨 Mild Gust": 30,
-            "💨 Gusty Winds": 40,
-            "💨 Strong Gusty Winds": 50,
-            "💨 Storm Gust Winds": 60,
-            "💨 Strong Winds": 70,
-            "💨 Stormy Winds": 80,
-            "💨 Strong Storm Winds": 90,
-            "💨 Gale Force Winds": 100,
-            "💨 Gale Force Gusts": 110
-        };
-        const severity = windSeverityMap[windCondition] || 0;
-        conditions.push({ condition: windCondition, severity });
-    }
+  const rainCondition = precipCondition(observation);
+  if (rainCondition && rainCondition !== false) { // Exclude invalid values
+      const rainSeverityMap = {
+          "🌧️ Misting": 10,
+          "🌧️ Drizzling": 20,
+          "🌧️ Light Rain": 30,
+          "🌧️ Raining": 40,
+          "🌧️ Moderate Rain": 50,
+          "🌧️ Heavy Rain": 60,
+          "🌧️ Very Heavy Rain": 70,
+          "🌧️ Downpour": 80,
+          "🌧️ Heavy Downpour": 90,
+          "🌧️ Torrential Downpour": 100,
+          "🌧️ Heavy Torrential Downpour": 110,
+          "🌧️ Extreme Torrential Downpour": 120
+      };
+      const severity = rainSeverityMap[rainCondition] || 0;
+      console.log("Adding Rain Condition: ", { condition: rainCondition, severity: rainSeverityMap[rainCondition] || 0 });
+      conditions.push({ condition: rainCondition, severity });
+  }
 
-    // Solar is always present; default lower severity for calm weather
-    if (solarCondition) {
-        const solarSeverityMap = {
-            "😎 Bright Sun": 20,
-            "💦😎 Muggy": 30,
-            "🌤️ Partly Sunny": 10,
-            "🌤️ Hazy": 10,
-            "☁️ Overcast": 10,
-            "☀️ Sunny": 20,
-            "🌇 Twilight": 5,
-            "🌃 Night": 5,
-            "😌 Calm": 0
-        };
-        const severity = solarSeverityMap[solarCondition] || 0;
-        conditions.push({ condition: solarCondition, severity });
-    }
+  const windCondition = windCheck(windSpeed, windGust);
+  if (windCondition && windCondition !== false) { // Ensure valid wind condition
+      const windSeverityMap = {
+          "💨 Light Breeze": 10,
+          "💨 Light Wind": 20,
+          "💨 Mild Gust": 30,
+          "💨 Gusty Winds": 40,
+          "💨 Strong Gusty Winds": 50,
+          "💨 Storm Gust Winds": 60,
+          "💨 Strong Winds": 70,
+          "💨 Stormy Winds": 80,
+          "💨 Strong Storm Winds": 90,
+          "💨 Gale Force Winds": 100,
+          "💨 Gale Force Gusts": 110
+      };
+      const severity = windSeverityMap[windCondition] || 0;
+      console.log("Adding Wind Condition: ", { condition: windCondition, severity: windSeverityMap[windCondition] || 0 });
+      conditions.push({ condition: windCondition, severity });
+  }
 
-    // Sort conditions by severity (highest first)
-    conditions.sort((a, b) => b.severity - a.severity);
+  const solarCondition = solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour);
+  if (solarCondition && solarCondition !== false) { // Exclude invalid values
+      const solarSeverityMap = {
+          "😎 Bright Sun": 20,
+          "💦😎 Muggy": 30,
+          "🌤️ Partly Sunny": 10,
+          "🌤️ Hazy": 10,
+          "☁️ Overcast": 10,
+          "☀️ Sunny": 20,
+          "🌇 Twilight": 5,
+          "🌃 Night": 5,
+          "😌 Calm": 1
+      };
+      const severity = solarSeverityMap[solarCondition] || 0;
+      console.log("Adding Solar Condition: ", { condition: solarCondition, severity: solarSeverityMap[solarCondition] || 0 });
+      conditions.push({ condition: solarCondition, severity });
+  }
 
-    // Take the most severe condition or fallback
-    const mostSevereCondition = conditions.length > 0 ? conditions[0].condition : "😌 Calm";
+  console.log("Final Conditions Array (Pre-Sort): ", conditions);
+  // Sort conditions by severity (highest first)
+  conditions = conditions.filter(item => item.condition !== false); // Ensure no false values are included
+  conditions.sort((a, b) => b.severity - a.severity);
+  console.log("Final Conditions Array (Post-Sort): ", conditions);
 
-    // Add temperature descriptor
-    const temperatureDescriptor = getTemperatureDescriptor(temperature);
-    console.log("Temperature Descriptor: ", temperatureDescriptor);
-    
-    // Set background based on temperature
-    setBackgroundColor(temperatureDescriptor);
+  // Determine the most severe condition or fallback
+  const mostSevereCondition = conditions.length > 0 ? conditions[0].condition : "😌 Calm";
 
-    // Combine and return
-    return `${mostSevereCondition} & ${temperatureDescriptor}`;
+  // Add temperature descriptor
+  const temperatureDescriptor = getTemperatureDescriptor(temperature);
+  console.log("Temperature Descriptor: ", temperatureDescriptor);
+
+  // Set background based on temperature
+  setBackgroundColor(temperatureDescriptor);
+
+  // Combine and return
+  return `${mostSevereCondition || "Unknown"} & ${temperatureDescriptor || "Unknown"}`;
 }
 
     
-    function snowCheck(temperature, dewPoint, humidity) {
-        // Conditions to immediately return no snow chance
-        if (temperature >= 34 || dewPoint > 30 || humidity < 70) {
-            return [false, 0]; // No snow
-        }
+function snowCheck(observation) {
+  const temperature = observation.tempf; // Using AmbientWeather temperature
+  const humidity = observation.humidity; 
+  const dewPoint = calculateDewPoint(temperature, humidity);
+
+  if (temperature >= 34 || dewPoint > 30 || humidity < 70) {
+      return [false, 0]; // No snow
+  }
     
-        // Base snow chance calculation
-        let snowChance = 0;
-    
-        // Rebalanced resolution for snow chance calculation
-        if (temperature < 34 && dewPoint <= 29 && humidity >= 70) {
-            snowChance += 40; // Base chance
-    
-            // Adjust based on temperature proximity to dew point
-            const tempDewPointGap = Math.abs(temperature - dewPoint);
-            if (tempDewPointGap <= 1) snowChance += 20; // Very close to dew point
-            else if (tempDewPointGap <= 3) snowChance += 15;
-            else if (tempDewPointGap <= 5) snowChance += 10;
-            else if (tempDewPointGap <= 10) snowChance += 5;
-    
-            // Adjust based on humidity levels (greater influence on snow chance)
-            if (humidity >= 75) snowChance += 10;
-            if (humidity >= 80) snowChance += 15;
-            if (humidity >= 90) snowChance += 20;
-            if (humidity >= 95) snowChance += 25;
-    
-            // Adjust based on dew point proximity (higher points for 25°F–29°F range)
-            if (dewPoint >= 25 && dewPoint <= 29) snowChance += 25; // Most likely range
-            else if (dewPoint >= 20 && dewPoint < 25) snowChance += 15; // Moderate range
-            else if (dewPoint >= 18 && dewPoint < 20) snowChance += 10; // Less likely range
-            else if (dewPoint < 18) snowChance += 5; // Minimal chance
-        }
-    
-        // Ensure snow chance doesn't exceed 100%
-        snowChance = Math.min(snowChance, 100);
-    
-        return [true, snowChance]; // Snow conditions likely with calculated chance
+    // Base snow chance calculation
+    let snowChance = 0;
+
+    // Rebalanced resolution for snow chance calculation
+    if (temperature < 34 && dewPoint <= 29 && humidity >= 70) {
+        snowChance += 40; // Base chance
+
+        // Adjust based on temperature proximity to dew point
+        const tempDewPointGap = Math.abs(temperature - dewPoint);
+        if (tempDewPointGap <= 1) snowChance += 20; // Very close to dew point
+        else if (tempDewPointGap <= 3) snowChance += 15;
+        else if (tempDewPointGap <= 5) snowChance += 10;
+        else if (tempDewPointGap <= 10) snowChance += 5;
+
+        // Adjust based on humidity levels (greater influence on snow chance)
+        if (humidity >= 75) snowChance += 10;
+        if (humidity >= 80) snowChance += 15;
+        if (humidity >= 90) snowChance += 20;
+        if (humidity >= 95) snowChance += 25;
+
+        // Adjust based on dew point proximity (higher points for 25°F–29°F range)
+        if (dewPoint >= 25 && dewPoint <= 29) snowChance += 25; // Most likely range
+        else if (dewPoint >= 20 && dewPoint < 25) snowChance += 15; // Moderate range
+        else if (dewPoint >= 18 && dewPoint < 20) snowChance += 10; // Less likely range
+        else if (dewPoint < 18) snowChance += 5; // Minimal chance
     }
+
+    // Ensure snow chance doesn't exceed 100%
+    snowChance = Math.min(snowChance, 100);
+
+    return [true, snowChance]; // Snow conditions likely with calculated chance
+}
     
 
-    function precipCondition(temperature, precipRate) {
-        // Skip if temperature is 32°F or below
-        if (temperature <= 32) {
-            return [false];
-        }
+function precipCondition(observation) {
+  const temperature = observation.tempf;
+  const precipRate = observation.hourlyrainin;
+
+  if (temperature <= 32) {
+      return [false];
+  }
     
-        // Determine rain condition based on precipitation rate
-        let rainCondition;
-        if (precipRate > 0 && precipRate <= 0.025) {
-            rainCondition = "🌧️ Misting";
-        } else if (precipRate > 0.025 && precipRate <= 0.04) {
-            rainCondition = "🌧️ Drizzling";
-        } else if (precipRate > 0.04 && precipRate <= 0.07) {
-            rainCondition = "🌧️ Light Rain";
-        } else if (precipRate > 0.07 && precipRate <= 0.25) {
-            rainCondition = "🌧️ Raining";
-        } else if (precipRate > 0.25 && precipRate <= 0.35) {
-            rainCondition = "🌧️ Moderate Rain";
-        } else if (precipRate > 0.35 && precipRate <= 0.50) {
-            rainCondition = "🌧️ Heavy Rain";
-        } else if (precipRate > 0.50 && precipRate <= 0.65) {
-            rainCondition = "🌧️ Very Heavy Rain";
-        } else if (precipRate > 0.65 && precipRate <= 0.75) {
-            rainCondition = "🌧️ Downpour";
-        } else if (precipRate > 0.75 && precipRate <= 0.85) {
-            rainCondition = "🌧️ Heavy Downpour";
-        } else if (precipRate > 0.85 && precipRate <= 1.0) {
-            rainCondition = "🌧️ Torrential Downpour";
-        } else if (precipRate > 1.0 && precipRate <= 1.5) {
-            rainCondition = "🌧️ Heavy Torrential Downpour";
-        } else if (precipRate > 1.5) {
-            rainCondition = "🌧️ Extreme Torrential Downpour";
-        }
+  // Determine rain condition based on precipitation rate
+  let rainCondition;
+  if (precipRate > 0 && precipRate <= 0.025) {
+      rainCondition = "🌧️ Misting";
+  } else if (precipRate > 0.025 && precipRate <= 0.04) {
+      rainCondition = "🌧️ Drizzling";
+  } else if (precipRate > 0.04 && precipRate <= 0.07) {
+      rainCondition = "🌧️ Light Rain";
+  } else if (precipRate > 0.07 && precipRate <= 0.25) {
+      rainCondition = "🌧️ Raining";
+  } else if (precipRate > 0.25 && precipRate <= 0.35) {
+      rainCondition = "🌧️ Moderate Rain";
+  } else if (precipRate > 0.35 && precipRate <= 0.50) {
+      rainCondition = "🌧️ Heavy Rain";
+  } else if (precipRate > 0.50 && precipRate <= 0.65) {
+      rainCondition = "🌧️ Very Heavy Rain";
+  } else if (precipRate > 0.65 && precipRate <= 0.75) {
+      rainCondition = "🌧️ Downpour";
+  } else if (precipRate > 0.75 && precipRate <= 0.85) {
+      rainCondition = "🌧️ Heavy Downpour";
+  } else if (precipRate > 0.85 && precipRate <= 1.0) {
+      rainCondition = "🌧️ Torrential Downpour";
+  } else if (precipRate > 1.0 && precipRate <= 1.5) {
+      rainCondition = "🌧️ Heavy Torrential Downpour";
+  } else if (precipRate > 1.5) {
+      rainCondition = "🌧️ Extreme Torrential Downpour";
+  }
+
+  return rainCondition;
+}
     
-        return rainCondition;
-    }
     
-    
-    function windCheck(windSpeed, windGust) {
-        // Skip if both windSpeed and windGust are 0
-        if (windSpeed === 0 && windGust === 0) {
-            return [false];
-        }
-    
-        // Determine wind condition based on windSpeed and windGust
-        let windCondition;
-        if (windSpeed > 30) {
-            windCondition = "💨 Gale Force Winds";
-        } else if (windSpeed > 25 && windSpeed <= 30) {
-            windCondition = "💨 Strong Storm Winds";
-        } else if (windGust > 25) {
-            windCondition = "💨 Gale Force Gusts";
-        } else if (windSpeed > 17 && windSpeed <= 25) {
-            windCondition = "💨 Stormy Winds";
-        } else if (windGust > 19 && windGust <= 25) {
-            windCondition = "💨 Strong Storm Gusts";
-        } else if (windSpeed > 13 && windSpeed <= 17) {
-            windCondition = "💨 Strong Winds";
-        } else if (windGust > 14 && windGust <= 19) {
-            windCondition = "💨 Storm Gust Winds";
-        } else if (windGust > 10 && windGust <= 14) {
-            windCondition = "💨 Strong Gusty Winds";
-        } else if (windSpeed > 10 && windSpeed <= 13) {
-            windCondition = "💨 Very Windy";
-        } else if (windGust > 7 && windGust <= 10) {
-            windCondition = "💨 Gusty Winds";
-        } else if (windSpeed > 7 && windSpeed <= 10) {
-            windCondition = "💨 Windy";
-        } else if (windGust > 5 && windGust <= 7) {
-            windCondition = "💨 Mild Gust";
-        } else if (windGust > 3 && windGust <= 5) {
-            windCondition = "💨 Light Gust";
-        } else if (windSpeed > 4 && windSpeed <= 7) {
-            windCondition = "💨 Light Wind";
-        } else if (windSpeed > 1 && windSpeed <= 4) {
-            windCondition = "💨 Light Breeze";
-        }
-    
-        return windCondition;
-    }
+function windCheck(windSpeed, windGust) {
+  // Return null if both windSpeed and windGust are 0
+  if (windSpeed === 0 && windGust === 0) {
+    return null; // Return null to indicate no wind condition
+  }
+
+  // Determine wind condition based on windSpeed and windGust
+  let windCondition;
+  if (windSpeed > 30) {
+      windCondition = "💨 Gale Force Winds";
+  } else if (windSpeed > 25 && windSpeed <= 30) {
+      windCondition = "💨 Strong Storm Winds";
+  } else if (windGust > 25) {
+      windCondition = "💨 Gale Force Gusts";
+  } else if (windSpeed > 17 && windSpeed <= 25) {
+      windCondition = "💨 Stormy Winds";
+  } else if (windGust > 19 && windGust <= 25) {
+      windCondition = "💨 Strong Storm Gusts";
+  } else if (windSpeed > 13 && windSpeed <= 17) {
+      windCondition = "💨 Strong Winds";
+  } else if (windGust > 14 && windGust <= 19) {
+      windCondition = "💨 Storm Gust Winds";
+  } else if (windGust > 10 && windGust <= 14) {
+      windCondition = "💨 Strong Gusty Winds";
+  } else if (windSpeed > 10 && windSpeed <= 13) {
+      windCondition = "💨 Very Windy";
+  } else if (windGust > 7 && windGust <= 10) {
+      windCondition = "💨 Gusty Winds";
+  } else if (windSpeed > 7 && windSpeed <= 10) {
+      windCondition = "💨 Windy";
+  } else if (windGust > 5 && windGust <= 7) {
+      windCondition = "💨 Mild Gust";
+  } else if (windGust > 3 && windGust <= 5) {
+      windCondition = "💨 Light Gust";
+  } else if (windSpeed > 4 && windSpeed <= 7) {
+      windCondition = "💨 Light Wind";
+  } else if (windSpeed > 1 && windSpeed <= 4) {
+      windCondition = "💨 Light Breeze";
+  }
+
+  return windCondition || null; // Return null if no condition matches
+}
     
 
-    function solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour) {
-        
-        if (solarRadiation === 0 && uvIndex === 0) {
-            return "😌 Calm";
-        }
-    
-        // Determine solar condition
-        let solarCondition;
-        if (solarRadiation > 600 && uvIndex > 4) {
-            solarCondition = "😎 Bright Sun";
-        } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
-            solarCondition = "💦😎 Muggy";
-        } else if (humidity > 69 && solarRadiation >= 119 && solarRadiation < 299) {
-            solarCondition = "🌤️ Partly Sunny";
-        } else if (humidity > 69 && solarRadiation >= 79 && solarRadiation < 201) {
-            solarCondition = "🌤️ Hazy";
-        } else if (humidity > 70 && solarRadiation >= 1 && solarRadiation < 79) {
-            solarCondition = "☁️ Overcast";
-        } else if (solarRadiation > 135 && humidity < 80) {
-            solarCondition = "☀️ Sunny";
-        } else if (solarRadiation > 0 && solarRadiation < 79 && currentHour >= 18) {
-            solarCondition = "🌇 Twilight";
-        } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 7)) {
-            solarCondition = "🌃 Night";
-        } else {
-            solarCondition = "😌 Calm";
-        }
-    
-        return solarCondition;
-    }
-    
-    
+function solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour) {
+  // Determine solar condition
+  let solarCondition = null;
+
+  if (solarRadiation > 600 && uvIndex > 4) {
+      solarCondition = "😎 Bright Sun";
+  } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
+      solarCondition = "💦😎 Muggy";
+  } else if (humidity > 69 && solarRadiation >= 119 && solarRadiation < 299) {
+      solarCondition = "🌤️ Partly Sunny";
+  } else if (humidity > 69 && solarRadiation >= 79 && solarRadiation < 201) {
+      solarCondition = "🌤️ Hazy";
+  } else if (humidity > 70 && solarRadiation >= 1 && solarRadiation < 79) {
+      solarCondition = "☁️ Overcast";
+  } else if (solarRadiation > 135 && humidity < 80) {
+      solarCondition = "☀️ Sunny";
+  } else if (solarRadiation > 0 && solarRadiation < 79 && currentHour >= 18) {
+      solarCondition = "🌇 Twilight";
+  } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 7)) {
+      solarCondition = "🌃 Night";
+  }
+
+  // Use "😌 Calm" only if no other condition matches
+  return solarCondition || "😌 Calm";
+}
 
 
 
@@ -416,28 +500,130 @@ function setBackgroundColor(descriptor) {
     }
 }
 
+function calculateTimeUntilNextUpdate() {
+  const now = new Date();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  const nextIntervalMinutes = Math.ceil(minutes / 5) * 5;
+
+  const nextUpdateTime = new Date(now);
+  nextUpdateTime.setMinutes(nextIntervalMinutes);
+  nextUpdateTime.setSeconds(15); // Buffer
+  nextUpdateTime.setMilliseconds(0);
+
+  if (nextUpdateTime <= now) {
+      nextUpdateTime.setMinutes(nextUpdateTime.getMinutes() + 5);
+  }
+
+  return Math.ceil((nextUpdateTime.getTime() - now.getTime()) / 1000);
+}
+
+
+function clearAndResetTimer() {
+  if (updateTimer) {
+      clearInterval(updateTimer);
+      updateTimer = null; // Reset to avoid unintended behavior
+  }
+}
+
+function updateCountdownText(nextUpdateTimerElem, secondsRemaining) {
+  nextUpdateTimerElem.textContent = secondsRemaining === 0
+      ? "Updating..."
+      : `${secondsRemaining} seconds`;
+}
+
+function calculateNextUpdate(lastUpdate) {
+    const nextUpdateTime = new Date(lastUpdate);
+    nextUpdateTime.setMinutes(nextUpdateTime.getMinutes() + 5);
+    nextUpdateTime.setSeconds(0); // Ensure seconds are set to 0 for clean display
+    nextUpdateTime.setMilliseconds(0);
+    return nextUpdateTime;
+}
+
+// Example usage:
+const lastUpdate = new Date(); // Replace with actual timestamp of the last update
+const nextUpdateTime = calculateNextUpdate(lastUpdate);
+
+// Update the "Next Update Time" display
+document.getElementById("next-update-time").textContent = nextUpdateTime.toLocaleString([], { 
+    year: 'numeric', 
+    month: 'numeric', 
+    day: 'numeric', 
+    hour: 'numeric', 
+    minute: 'numeric' 
+});
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
-    fetchWeatherData(); // Fetch weather data immediately when the page loads
+  fetchWeatherData(); // Fetch weather data immediately when the page loads
 
-    // Periodically fetch weather data every 60 seconds
-    setInterval(() => {
-        fetchWeatherData();
-        document.getElementById("next-update").textContent = 60; // Reset the next update time
-        startNextUpdateTimer(); // Restart the countdown timer for the next update
-    }, 60000); // Fetch every 60,000 milliseconds (1 minute)
+  // Start the countdown timer with a synchronized duration
+  startNextUpdateTimer();
 
-    // Countdown timer for the next update
-    function startNextUpdateTimer() {
-        const nextUpdateElem = document.getElementById("next-update");
-        clearInterval(updateTimer); // Clear any previous interval for the timer
-        updateTimer = setInterval(() => {
-            nextUpdateElem.textContent = Math.max(0, nextUpdateElem.textContent - 1); // Decrement the countdown
-        }, 1000); // Update every 1 second
+  // Periodically restart the synchronized timer
+  setInterval(() => {
+      startNextUpdateTimer(); // Restart the countdown timer for the next update
+  }, 315000); // Restart every 315 seconds (5 minutes + 15 seconds)
+
+  // Countdown timer for the next update
+  function startNextUpdateTimer() {
+    const nextUpdateTimerElem = document.getElementById("next-update"); // Countdown timer
+    const nextUpdateTimeElem = document.getElementById("next-update-time"); // Next update timestamp
+
+    // Ensure DOM elements exist
+    if (!nextUpdateTimerElem || !nextUpdateTimeElem) {
+        console.warn("Countdown timer or next update time element is missing!");
+        return;
     }
 
-    // Start the countdown timer immediately
-    document.getElementById("next-update").textContent = 60; // Initialize to 60 seconds
-    startNextUpdateTimer();
+    // Clear any existing timer
+    clearInterval(updateTimer);
+
+    // Calculate the time until the next 5-minute mark with a 15-second buffer
+    const secondsUntilNextUpdate = calculateTimeUntilNextUpdate();
+
+    // Determine the exact next update time (internal logic includes the buffer)
+    const nextUpdateTime = new Date();
+    nextUpdateTime.setSeconds(nextUpdateTime.getSeconds() + secondsUntilNextUpdate);
+
+    // Create a user-facing timestamp without the 15-second buffer
+    const displayNextUpdateTime = new Date(nextUpdateTime.getTime() - 15000);
+
+    // Update the "Next Update Time" display (user-facing timestamp)
+    nextUpdateTimeElem.textContent = displayNextUpdateTime.toLocaleString([], { 
+        year: 'numeric', 
+        month: 'numeric', 
+        day: 'numeric', 
+        hour: 'numeric', 
+        minute: 'numeric', 
+        second: 'numeric' 
+    });
+
+    // Start countdown timer (seconds)
+    updateTimer = setInterval(() => {
+        const now = new Date();
+        const secondsRemaining = Math.max(0, Math.ceil((nextUpdateTime - now) / 1000));
+
+        // Update countdown timer display
+        nextUpdateTimerElem.textContent = secondsRemaining === 0
+            ? "Updating..."
+            : `${secondsRemaining} seconds`;
+
+        // When the timer hits 0
+        if (secondsRemaining === 0) {
+            clearInterval(updateTimer); // Stop the timer
+            fetchWeatherData(); // Fetch new data
+            startNextUpdateTimer(); // Recalculate and restart the timer for the next update
+        }
+    }, 1000); // Update every second
+}
+
+
+
+  // Start the countdown timer immediately
+  startNextUpdateTimer();
 });
+
 

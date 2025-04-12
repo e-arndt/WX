@@ -7,21 +7,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KWAFEDER5 WX Station</title>
     <link rel="icon" href="images/weather.png" type="image/png">
-    <link rel="stylesheet" href="styles/WU.css">
+    <link rel="stylesheet" href="styles/ambient.css">
 </head>
 
 <body>
     <h1>LIVE Federal Way Weather</h1>
     <div class="container">
         <div class="group temp-humidity-windchill">
-            <p class="group-title">Temperature, Humidity, and Wind Chill</p>
+            <p class="group-title">Temperature, Humidity, and Dew Point</p>
             <p>Station ID: <span id="station-id"></span></p>
             <p>Temperature: <span id="temperature"></span>°F</p>
             <p>Humidity: <span id="humidity"></span>%</p>
             <p>Dew Point: <span id="dew-point"></span>°F</p>
         </div>
         <div class="group wind-speed-gust-direction">
-            <p class="group-title">Wind Speed, Gust, and Direction</p>
+            <p class="group-title">Wind Speed, Gust, Direction and Chill</p>
             <p>Wind Speed: <span id="wind-speed"></span> mph</p>
             <p>Wind Gust: <span id="wind-gust"></span> mph</p>
             <p>Wind Direction: <span id="wind-dir"></span></p>
@@ -45,9 +45,10 @@
     </div>
     <div class="update-info center">
         <p>Updated: <span id="last-update"></span></p>
-        <p>Next update in: <span id="next-update"></span> seconds</p>
-        <P>Ambient Ver 1.70</P>
+        <p>Next update in: <span id="next-update"></span></p>
+        <p>Next update time: <span id="next-update-time"></span></p>
+        <P>Ambient Ver 1.75</P>
     </div>
-    <script src="scripts/WU.js"></script>
+    <script src="scripts/ambient.js"></script>
 </body>
 </html>
