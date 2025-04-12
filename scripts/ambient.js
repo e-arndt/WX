@@ -58,7 +58,7 @@ async function fetchWeatherData() {
           document.getElementById("pressure").textContent = pressure.toFixed(2); // Pressure in inHg
           document.getElementById("wind-speed").textContent = observation.windspeedmph.toFixed(1); // Wind Speed in mph
           document.getElementById("wind-gust").textContent = observation.windgustmph.toFixed(1); // Wind Gust in mph
-          document.getElementById("solar-radiation").textContent = observation.solarradiation.toFixed(1); // Solar Radiation
+          document.getElementById("solar-radiation").textContent = observation.solarradiation.toFixed(2); // Solar Radiation
           document.getElementById("uv-index").textContent = observation.uv.toFixed(1); // UV Index
 
           const windChill = getWindChillOrDefault(observation);
@@ -346,25 +346,25 @@ function precipCondition(observation) {
       rainCondition = "🌧️ Misting";
   } else if (precipRate > 0.025 && precipRate <= 0.04) {
       rainCondition = "🌧️ Drizzling";
-  } else if (precipRate > 0.04 && precipRate <= 0.07) {
+  } else if (precipRate > 0.04 && precipRate <= 0.10) {
       rainCondition = "🌧️ Light Rain";
-  } else if (precipRate > 0.07 && precipRate <= 0.25) {
+  } else if (precipRate > 0.10 && precipRate <= 0.30) {
       rainCondition = "🌧️ Raining";
-  } else if (precipRate > 0.25 && precipRate <= 0.35) {
+  } else if (precipRate > 0.30 && precipRate <= 0.50) {
       rainCondition = "🌧️ Moderate Rain";
-  } else if (precipRate > 0.35 && precipRate <= 0.50) {
-      rainCondition = "🌧️ Heavy Rain";
   } else if (precipRate > 0.50 && precipRate <= 0.65) {
-      rainCondition = "🌧️ Very Heavy Rain";
+      rainCondition = "🌧️ Heavy Rain";
   } else if (precipRate > 0.65 && precipRate <= 0.75) {
-      rainCondition = "🌧️ Downpour";
+      rainCondition = "🌧️ Very Heavy Rain";
   } else if (precipRate > 0.75 && precipRate <= 0.85) {
-      rainCondition = "🌧️ Heavy Downpour";
+      rainCondition = "🌧️ Downpour";
   } else if (precipRate > 0.85 && precipRate <= 1.0) {
-      rainCondition = "🌧️ Torrential Downpour";
+      rainCondition = "🌧️ Heavy Downpour";
   } else if (precipRate > 1.0 && precipRate <= 1.5) {
+      rainCondition = "🌧️ Torrential Downpour";
+  } else if (precipRate > 1.5 && precipRate <= 1.75) {
       rainCondition = "🌧️ Heavy Torrential Downpour";
-  } else if (precipRate > 1.5) {
+  } else if (precipRate > 1.75) {
       rainCondition = "🌧️ Extreme Torrential Downpour";
   }
 
