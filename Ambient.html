@@ -1,16 +1,53 @@
+<!--Webpage that uses api key to pull data from my weather station hosted at weather underground-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ambient Weather Embed</title>
-    <link rel="stylesheet" href="ambient.css">
+    <title>KWAFEDER5 WX Station</title>
+    <link rel="icon" href="images/weather.png" type="image/png">
+    <link rel="stylesheet" href="styles/WU.css">
 </head>
+
 <body>
-    <!-- Responsive iFrame with Accessibility Enhancements -->
-    <div class="iframe-container">
-        <iframe title="Ambient Weather Data" src="https://ambientweather.net/devices/public/dbfa26f41809afdc6dd67f457a2e25b9?embed=true"></iframe>
+    <h1>LIVE Federal Way Weather</h1>
+    <div class="container">
+        <div class="group temp-humidity-windchill">
+            <p class="group-title">Temperature, Humidity, and Wind Chill</p>
+            <p>Station ID: <span id="station-id"></span></p>
+            <p>Temperature: <span id="temperature"></span>°F</p>
+            <p>Humidity: <span id="humidity"></span>%</p>
+            <p>Dew Point: <span id="dew-point"></span>°F</p>
+        </div>
+        <div class="group wind-speed-gust-direction">
+            <p class="group-title">Wind Speed, Gust, and Direction</p>
+            <p>Wind Speed: <span id="wind-speed"></span> mph</p>
+            <p>Wind Gust: <span id="wind-gust"></span> mph</p>
+            <p>Wind Direction: <span id="wind-dir"></span></p>
+            <p>Wind Chill: <span id="wind-chill"></span>°F</p>
+        </div>
+        <div class="group solar-uv">
+            <p class="group-title">Solar Radiation and UV Index</p>
+            <p>Solar Radiation: <span id="solar-radiation"></span> W/m²</p>
+            <p>UV Index: <span id="uv-index"></span></p>
+        </div>
+        <div class="group pressure">
+            <p class="group-title">Pressure and Precipitation</p>
+            <p>Pressure: <span id="pressure"></span> inHg</p>
+            <p>Precipitation Rate: <span id="precip-rate"></span> in/hr</p>
+            <p>Total Precipitation: <span id="total-precip"></span> in</p>
+        </div>
+        <div class="group current-condition"> <!-- New box for current conditions -->
+            <p class="group-title">Current Condition</p>
+            <p id="current-condition"></p>
+        </div>
     </div>
-    <p>Powered by <a class="ambient-link" target="_blank" href="https://ambientweather.net">Ambient Weather</a></p>
+    <div class="update-info center">
+        <p>Updated: <span id="last-update"></span></p>
+        <p>Next update in: <span id="next-update"></span> seconds</p>
+        <P>Ambient Ver 1.70</P>
+    </div>
+    <script src="scripts/WU.js"></script>
 </body>
 </html>

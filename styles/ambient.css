@@ -1,41 +1,161 @@
+
 body {
-    background-color: #111111; /* Background color of your page */
-    color: #d6dd0a; /* Default text color */
-    font-family: Arial, sans-serif; /* Font style */
+    font-family: Arial, sans-serif;
+    margin: 10px;
+    background-color: rgb(79, 14, 14);
+    font-size: 1.35rem;
+}
+
+h1 {
+    color: rgb(255, 230, 45);
+    text-align: center;
+    margin-top: -7px;
+    margin-bottom: 5px;
 }
 
 
-/* Ambient Weather Styles */
-
-.iframe-container {
-    position: relative;
-    padding-bottom: 80%;
-    height: 0;
-    overflow: hidden;
-    max-width: 100%;
-    height: auto;
-    border: 3px solid #da144c; /* Border color and thickness */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.iframe-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+.group {
+    flex: 1 1 calc(33% - 45px);
+    padding: 5px;
+    border-radius: 5px;
+    padding-left: 15px;
+    border: 2px solid #0b0b0b;
 }
 
-/* CSS for the Ambient Weather link */
-.ambient-link {
-    color: #4a90e2; /* Replace with your desired color */
-    font-weight: bold; /* Optional: make the text bold */
-    text-decoration: none; /* Optional: remove underline */
+.group-title {
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
-.ambient-link:hover {
-    color: #1fcddd; /* Replace with your desired hover color */
-    text-decoration: underline; /* Optional: underline on hover */
+.temp-humidity-windchill {
+    background-color: #7fe16e;
+}
+
+.wind-speed-gust-direction {
+    background-color: #8fd6f6;
+}
+
+.solar-uv {
+    background-color: #f5c47a;
+}
+
+.pressure {
+    background-color: #f7acf7;
+}
+
+.precip-rate {
+    background-color: #f5adad;
+}
+
+.group.current-condition { 
+    color: #000000; 
+    text-align: center;
+    font-size: 2rem;
+    background-color: gray;
+    transition: background-color 2s ease-in-out;
+}
+
+.group.current-condition.default-condition { 
+    background-color: gray; /* Default gray background */
+}
+
+#current-condition  {
+    margin: 20px 25px 25px 0;
+}
+
+.update-info {
+    margin-top: 10px;
+    padding: 5px;
+    border: 2px solid #0b0b0b;
+    border-radius: 5px;
+    background-color: #cd95f7;
+}
+
+.center {
+    text-align: center;
+}
+
+.group.current-condition.extreme-cold {
+    background-color: darkblue;
+    color: white;
+}
+
+.group.current-condition.bitter-cold {
+    background-color: steelblue;
+    color: white;
+}
+
+.group.current-condition.freezing {
+    background-color: lightblue;
+    color: black;
+}
+
+.group.current-condition.cold {
+    background-color: #87CEFA; /* Light Sky Blue */
+    color: black;
+}
+
+.group.current-condition.cool {
+    background-color: lightgreen;
+    color: black;
+}
+
+.group.current-condition.comfortable {
+    background-color: lightyellow;
+    color: black;
+}
+
+.group.current-condition.warm {
+    background-color: yellow;
+    color: black;
+}
+
+.group.current-condition.hot {
+    background-color: orange;
+    color: black;
+}
+
+.group.current-condition.very-hot {
+    background-color: orangered;
+    color: white;
+}
+
+.group.current-condition.extreme-heat {
+    background-color: red;
+    color: white;
+}
+
+.group.current-condition.unknown {
+    background-color: rgb(119, 99, 99);
+    color: white;
 }
 
 
-/* Additional styling for the powered by link if needed */
+@media (max-width: 750px) {
+
+    body {
+        font-size: 1.1rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem !important; /* Add !important to ensure it applies */
+    }
+
+    .group.current-condition {
+        font-size: 1.25rem; /* Font size for the general content */
+    }
+    
+    .group.current-condition .group-title { 
+        font-size: 1.5rem; /* Font size for the header specifically */
+    }
+    
+
+
+}
+
