@@ -60,7 +60,7 @@ async function fetchWeatherData() {
           // Convert the value from Klux to Lux and format it with commas
           const solarRadiationValue = (observation.solarradiation * 100).toFixed(0); // Convert Klux to Lux
           const formattedValue = solarRadiationValue.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas
-          const calibrationFactor = 1.2;
+          const calibrationFactor = 1.266;
           const approximateWatts = solarRadiationValue * 0.0079 * calibrationFactor;
           console.log("Approximate Watts (W/m²): ", approximateWatts);
 
