@@ -7,7 +7,8 @@ const baseUrl = `https://api.ambientweather.net/v1/devices/${deviceId}?applicati
 let lastUpdateTime = null; // To track the last update time
 let checkingEveryMinute = false; // Flag to switch schedules
 
-let updateTimer;
+let updateTimer = null;
+let intervalId = null;
 
 function calculateDewPoint(temperature, humidity, pressureInHg = 29.92) {
   if (isNaN(temperature) || isNaN(humidity) || isNaN(pressureInHg)) {
@@ -22,7 +23,7 @@ function calculateDewPoint(temperature, humidity, pressureInHg = 29.92) {
   const dewPointCelsius = (243.5 * Math.log(e / 6.112)) / (17.67 - Math.log(e / 6.112));
   const dewPointFahrenheit = (dewPointCelsius * 1.8) + 32;
 
-  return Number(dewPointFahrenheit.toFixed(1)); // Ensure output is a valid number
+  return Number(dewPointFahrenheit.toFixed(2)); // Ensure output is a valid number
 }
 
 
@@ -44,7 +45,14 @@ async function fetchWeatherData() {
           // Extract required variables
           const temperature = observation.tempf;
           const humidity = observation.humidity;
-          const pressure = observation.baromrelin; // Ambient API pressure in inHg
+          const pressure = observation.baromabsin; // Ambient API pressure in inHg
+          
+          const lastRain = observation.lastRain;
+          if (lastRain) {
+            console.log("Last Rain Time (UTC): ", lastRain);
+
+            const localLastRain = new Date(lastRain).toLocaleString(); // Convert to local time
+            console.log("Last Rain Time (Local): ", localLastRain);
 
 
           // Calculate dew point using enhanced function
@@ -52,17 +60,37 @@ async function fetchWeatherData() {
           // Convert the value from Klux to Lux and format it with commas
           const solarRadiationValue = (observation.solarradiation * 100).toFixed(0); // Convert Klux to Lux
           const formattedValue = solarRadiationValue.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas
+          const calibrationFactor = 1.2;
+          const approximateWatts = solarRadiationValue * 0.0079 * calibrationFactor;
+          console.log("Approximate Watts (W/m²): ", approximateWatts);
 
           // Update DOM elements for station data
           document.getElementById("station-id").textContent = stationName;
           document.getElementById("temperature").textContent = temperature.toFixed(1); // Temperature in Fahrenheit
           document.getElementById("humidity").textContent = humidity.toFixed(1); // Relative Humidity percentage
           document.getElementById("dew-point").textContent = dewPoint; // Dew point in Fahrenheit
-          document.getElementById("pressure").textContent = pressure.toFixed(2); // Pressure in inHg
+          document.getElementById("pressure").textContent = pressure.toFixed(3); // Pressure in inHg
           document.getElementById("wind-speed").textContent = observation.windspeedmph.toFixed(1); // Wind Speed in mph
           document.getElementById("wind-gust").textContent = observation.windgustmph.toFixed(1); // Wind Gust in mph
           document.getElementById("solar-radiation").textContent = `${formattedValue}`; // Solar Radiation
           document.getElementById("uv-index").textContent = observation.uv.toFixed(0); // UV Index
+
+          const wattsElement = document.getElementById("approx-watts");
+          if (wattsElement) {
+            wattsElement.textContent = approximateWatts.toFixed(2); // Format to two decimal places
+            } else {
+                console.warn("Element with ID 'approx-watts' is missing!");
+            }
+
+          const maxDailyGust = observation.maxdailygust;
+          console.log("Max Daily Gust: ", maxDailyGust);
+
+          const maxDailyGustElement = document.getElementById("max-daily-gust");
+          if (maxDailyGustElement) {
+            maxDailyGustElement.textContent = maxDailyGust.toFixed(1); // Format to one decimal place
+            } else {
+                console.warn("Element with ID 'max-daily-gust' is missing!");
+            }
 
           const windChill = getWindChillOrDefault(observation);
           document.getElementById("wind-chill").textContent = `${windChill}`; // Wind Chill in Fahrenheit
@@ -72,6 +100,17 @@ async function fetchWeatherData() {
 
           document.getElementById("precip-rate").textContent = observation.hourlyrainin.toFixed(2); // Hourly precipitation rate
           document.getElementById("total-precip").textContent = observation.dailyrainin.toFixed(2); // Total daily precipitation
+
+          const lastRainElement = document.getElementById("last-rain");
+          if (lastRainElement) {
+            lastRainElement.textContent = localLastRain;
+            } 
+            else {
+                console.warn("Element with ID 'last-rain' is missing!");
+            }
+            } else {
+                console.warn("'lastRain' field is missing in the observation object!");
+            }
 
           // Update last update time
           const lastUpdate = observation.dateutc ? new Date(parseInt(observation.dateutc)) : null;
@@ -530,6 +569,19 @@ function clearAndResetTimer() {
       updateTimer = null; // Reset to avoid unintended behavior
   }
 }
+
+function startCheckingEveryMinute() {
+    console.log("Switching to 1-minute schedule...");
+    
+    // Clear any previous intervals
+    if (intervalId) {
+        clearInterval(intervalId);
+    }
+    
+    // Set a new interval for 1-minute polling
+    intervalId = setInterval(fetchWeatherData, 60 * 1000); // 60 seconds
+}
+
 
 function updateCountdownText(nextUpdateTimerElem, secondsRemaining) {
   nextUpdateTimerElem.textContent = secondsRemaining === 0
