@@ -67,7 +67,7 @@ async function fetchWeatherData() {
           // Update DOM elements for station data
           document.getElementById("station-id").textContent = stationName;
           document.getElementById("temperature").textContent = temperature.toFixed(1); // Temperature in Fahrenheit
-          document.getElementById("humidity").textContent = humidity.toFixed(1); // Relative Humidity percentage
+          document.getElementById("humidity").textContent = humidity.toFixed(0); // Relative Humidity percentage
           document.getElementById("dew-point").textContent = dewPoint; // Dew point in Fahrenheit
           document.getElementById("pressure").textContent = pressure.toFixed(3); // Pressure in inHg
           document.getElementById("wind-speed").textContent = observation.windspeedmph.toFixed(1); // Wind Speed in mph

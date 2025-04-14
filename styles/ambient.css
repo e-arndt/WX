@@ -9,8 +9,9 @@ body {
 h1 {
     color: rgb(255, 230, 45);
     text-align: center;
-    margin-top: -7px;
+    margin-top: -5px;
     margin-bottom: 5px;
+    font-size: 1.35rem;
 }
 
 
@@ -18,6 +19,7 @@ h1 {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    font-size: 1.2rem;
 }
 
 .group {
@@ -66,7 +68,7 @@ h1 {
 }
 
 #current-condition  {
-    margin: 20px 25px 25px 0;
+    margin: 40px 25px 25px 0;
 }
 
 .update-info {
@@ -80,6 +82,7 @@ h1 {
 .update-info p {
     margin: 0;
     margin: 10px 0;
+    font-size: 1.1rem;
 }
 
 .center {
@@ -145,22 +148,44 @@ h1 {
 @media (max-width: 750px) {
 
     body {
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+
+    .container p {
+        font-size: .85rem;
+        margin: 0;
+        margin-top: 15px;
     }
     
     h1 {
-        font-size: 1.5rem !important; /* Add !important to ensure it applies */
+        font-size: 1.25rem !important; /* Add !important to ensure it applies */
     }
 
     .group.current-condition {
-        font-size: 1.25rem; /* Font size for the general content */
+        font-size: 1.5rem; /* Font size for the general content */
     }
     
     .group.current-condition .group-title { 
-        font-size: 1.5rem; /* Font size for the header specifically */
+        font-size: 1.35rem; /* Font size for the header specifically */
     }
     
+    .update-info p {
+        margin: 0;
+        margin: 10px 0;
+        font-size: .85rem;
+    }
 
+    #current-condition  {
+        margin: 20px 25px 25px 0;
+    }
+
+    .update-info {
+        margin-top: 10px;
+        padding: 5px;
+        border: 5px solid rgb(201, 124, 2);
+        border-radius: 5px;
+        background-color: #cd95f7;
+    }
 
 }
 
