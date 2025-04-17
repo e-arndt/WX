@@ -255,16 +255,16 @@ function guessCurrentCondition(observation, currentHour) {
   if (rainCondition && rainCondition !== false) { // Exclude invalid values
       const rainSeverityMap = {
           "🌧️ Misting": 10,
-          "🌧️ Drizzling": 20,
-          "🌧️ Light Rain": 30,
-          "🌧️ Raining": 40,
-          "🌧️ Moderate Rain": 50,
-          "🌧️ Heavy Rain": 60,
-          "🌧️ Very Heavy Rain": 70,
-          "🌧️ Downpour": 80,
-          "🌧️ Heavy Downpour": 90,
-          "🌧️ Torrential Downpour": 100,
-          "🌧️ Heavy Torrential Downpour": 110,
+          "🌧️ Drizzling": 15,
+          "🌧️ Light Rain": 20,
+          "🌧️ Raining": 25,
+          "🌧️ Moderate Rain": 30,
+          "🌧️ Heavy Rain": 35,
+          "🌧️ Very Heavy Rain": 40,
+          "🌧️ Downpour": 50,
+          "🌧️ Heavy Downpour": 60,
+          "🌧️ Torrential Downpour": 70,
+          "🌧️ Heavy Torrential Downpour": 80,
           "🌧️ Extreme Torrential Downpour": 120
       };
       const severity = rainSeverityMap[rainCondition] || 0;
@@ -300,6 +300,7 @@ function guessCurrentCondition(observation, currentHour) {
           "💦😎 Muggy": 30,
           "🌤️ Partly Sunny": 10,
           "🌤️ Hazy": 10,
+          "🌫️ Foggy": 15,
           "☁️ Overcast": 10,
           "☀️ Sunny": 20,
           "🌇 Twilight": 5,
@@ -465,19 +466,21 @@ function solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour)
 
   if (solarRadiation > 600 && uvIndex > 4) {
       solarCondition = "😎 Bright Sun";
-  } else if (solarRadiation > 205 && uvIndex > 0 && humidity > 70 && temperature > 75) {
+  } else if (solarRadiation > 59 && uvIndex > 0 && humidity > 70 && temperature > 75) {
       solarCondition = "💦😎 Muggy";
   } else if (humidity > 69 && solarRadiation >= 119 && solarRadiation < 299) {
       solarCondition = "🌤️ Partly Sunny";
-  } else if (humidity > 69 && solarRadiation >= 79 && solarRadiation < 201) {
+  } else if (humidity > 69 && solarRadiation >= 59 && solarRadiation < 119) {
       solarCondition = "🌤️ Hazy";
-  } else if (humidity > 70 && solarRadiation >= 1 && solarRadiation < 79) {
+  } else if (solarRadiation < 10 && humidity >= 90 && (temperature - dewPoint) <= 2 && windspeedmph < 3) {
+      solarCondition = "🌫️ Foggy";
+  } else if (solarRadiation >= 1 && solarRadiation < 59 && (temperature - dewPoint < 7)) {
       solarCondition = "☁️ Overcast";
-  } else if (solarRadiation > 78 && humidity < 80) {
+  } else if (solarRadiation > 59 && humidity < 80) {
       solarCondition = "☀️ Sunny";
-  } else if (solarRadiation > 0 && solarRadiation < 79 && currentHour >= 18) {
+  } else if (solarRadiation > 0 && solarRadiation < 5 && currentHour >= 16) {
       solarCondition = "🌇 Twilight";
-  } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 7)) {
+  } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 8)) {
       solarCondition = "🌃 Night";
   }
 
