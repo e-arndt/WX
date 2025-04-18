@@ -302,7 +302,8 @@ function guessCurrentCondition(observation, currentHour) {
           "🌤️ Hazy": 10,
           "🌫️ Foggy": 15,
           "☁️ Overcast": 10,
-          "☀️ Sunny": 20,
+          "☀️ Sunny": 15,
+          "🌄 Morning": 5,
           "🌇 Twilight": 5,
           "🌃 Night": 5,
           "😌 Calm": 1
@@ -470,16 +471,18 @@ function solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour)
       solarCondition = "💦😎 Muggy";
   } else if (humidity > 69 && solarRadiation >= 119 && solarRadiation < 299) {
       solarCondition = "🌤️ Partly Sunny";
-  } else if (humidity > 69 && solarRadiation >= 59 && solarRadiation < 119) {
+  } else if (humidity > 69 && solarRadiation > 59 && solarRadiation < 119) {
       solarCondition = "🌤️ Hazy";
-  } else if (solarRadiation < 10 && humidity >= 90 && (temperature - dewPoint) <= 2 && windspeedmph < 3) {
+  } else if (solarRadiation < 15 && humidity >= 90 && (temperature - dewPoint) <= 2 && windspeedmph < 3) {
       solarCondition = "🌫️ Foggy";
-  } else if (solarRadiation >= 1 && solarRadiation < 59 && (temperature - dewPoint < 7)) {
+  } else if (solarRadiation >= 1 && solarRadiation < 59 && (temperature - dewPoint <= 7)) {
       solarCondition = "☁️ Overcast";
-  } else if (solarRadiation > 59 && humidity < 80) {
+  } else if (solarRadiation > 15 && humidity < 70) {
       solarCondition = "☀️ Sunny";
   } else if (solarRadiation > 0 && solarRadiation < 5 && currentHour >= 16) {
       solarCondition = "🌇 Twilight";
+  } else if (solarRadiation > 0 && solarRadiation <= 15 && (currentHour >= 6 || currentHour < 11)) {
+        solarCondition = "🌄 Morning";
   } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 8)) {
       solarCondition = "🌃 Night";
   }
