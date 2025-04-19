@@ -236,9 +236,9 @@ function guessCurrentCondition(observation, currentHour) {
   console.log("Humidity: ", humidity);
   console.log("Pressure (defaulting to 29.92): ", 29.92);
   const dewPoint = calculateDewPoint(temperature, humidity);
-  console.log("Dew Point Result: ", dewPoint);
+  console.log("Calculated Dew Point: ", dewPoint);
     if (typeof dewPoint === "number") {
-        console.log(`Dew Point: ${dewPoint.toFixed(1)}°F`);
+        console.log(`API Dew Point: ${dewPoint.toFixed(1)}°F`);
     } else {
         console.warn("Dew Point calculation returned an invalid value.");
         console.log("Dew Point: N/A");
@@ -558,7 +558,7 @@ function calculateTimeUntilNextUpdate() {
 
   const nextUpdateTime = new Date(now);
   nextUpdateTime.setMinutes(nextIntervalMinutes);
-  nextUpdateTime.setSeconds(15); // Buffer
+  nextUpdateTime.setSeconds(25); // Buffer
   nextUpdateTime.setMilliseconds(0);
 
   if (nextUpdateTime <= now) {
@@ -577,7 +577,7 @@ function clearAndResetTimer() {
 }
 
 function startCheckingEveryMinute() {
-    console.log("Switching to 1-minute schedule...");
+    console.log("Switching to 30-Seconds schedule...");
     
     // Clear any previous intervals
     if (intervalId) {
@@ -585,7 +585,7 @@ function startCheckingEveryMinute() {
     }
     
     // Set a new interval for 1-minute polling
-    intervalId = setInterval(fetchWeatherData, 60 * 1000); // 60 seconds
+    intervalId = setInterval(fetchWeatherData, 30 * 1000); // 30 seconds
 }
 
 
@@ -627,7 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Periodically restart the synchronized timer
   setInterval(() => {
       startNextUpdateTimer(); // Restart the countdown timer for the next update
-  }, 315000); // Restart every 315 seconds (5 minutes + 15 seconds)
+  }, 325000); // Restart every 325 seconds (5 minutes + 25 seconds)
 
   // Countdown timer for the next update
   function startNextUpdateTimer() {
@@ -651,7 +651,7 @@ document.addEventListener("DOMContentLoaded", () => {
     nextUpdateTime.setSeconds(nextUpdateTime.getSeconds() + secondsUntilNextUpdate);
 
     // Create a user-facing timestamp without the 15-second buffer
-    const displayNextUpdateTime = new Date(nextUpdateTime.getTime() - 15000);
+    const displayNextUpdateTime = new Date(nextUpdateTime.getTime() - 25000);
 
     // Update the "Next Update Time" display (user-facing timestamp)
     nextUpdateTimeElem.textContent = displayNextUpdateTime.toLocaleString([], { 
