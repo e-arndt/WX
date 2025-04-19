@@ -10,7 +10,12 @@ let checkingEveryMinute = false; // Flag to switch schedules
 let updateTimer = null;
 let intervalId = null;
 
-function calculateDewPoint(temperature, humidity, pressureInHg = 29.92) {
+function calculateDewPoint(temperature, humidity, pressureInHg = 29.723) {
+    console.log("DP Temperature: ", temperature);
+    console.log("DP Humidity: ", humidity);
+    console.log("DP ABS Pressure ", pressureInHg);
+    
+
   if (isNaN(temperature) || isNaN(humidity) || isNaN(pressureInHg)) {
       console.warn("Invalid inputs for dew point calculation:", { temperature, humidity, pressureInHg });
       return null; // Safeguard against invalid inputs
@@ -45,8 +50,10 @@ async function fetchWeatherData() {
           // Extract required variables
           const temperature = observation.tempf;
           const humidity = observation.humidity;
-          const pressure = observation.baromabsin; // Ambient API pressure in inHg
-          
+          const absPressure = observation.baromabsin; // Ambient API ABS pressure in inHg
+          console.log("API ABS Pressure: ", absPressure);
+          const relPressure = observation.baromrelin; // Ambient API REL pressure in inHg
+          console.log("API REL Pressure: ", relPressure);
           const lastRain = observation.lastRain;
           if (lastRain) {
             console.log("Last Rain Time (UTC): ", lastRain);
@@ -56,7 +63,8 @@ async function fetchWeatherData() {
 
 
           // Calculate dew point using enhanced function
-          const dewPoint = calculateDewPoint(temperature, humidity, pressure);
+          const dewPoint = calculateDewPoint(temperature, humidity, absPressure);
+          console.log("Fetch Call DP: ", dewPoint);
           // Convert the value from Klux to Lux and format it with commas
           const solarRadiationValue = (observation.solarradiation * 100).toFixed(0); // Convert Klux to Lux
           const formattedValue = solarRadiationValue.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas
@@ -69,7 +77,7 @@ async function fetchWeatherData() {
           document.getElementById("temperature").textContent = temperature.toFixed(1); // Temperature in Fahrenheit
           document.getElementById("humidity").textContent = humidity.toFixed(0); // Relative Humidity percentage
           document.getElementById("dew-point").textContent = dewPoint; // Dew point in Fahrenheit
-          document.getElementById("pressure").textContent = pressure.toFixed(3); // Pressure in inHg
+          document.getElementById("rel-pressure").textContent = relPressure.toFixed(3); // Pressure in inHg
           document.getElementById("wind-speed").textContent = observation.windspeedmph.toFixed(1); // Wind Speed in mph
           document.getElementById("wind-gust").textContent = observation.windgustmph.toFixed(1); // Wind Gust in mph
           document.getElementById("solar-radiation").textContent = `${formattedValue}`; // Solar Radiation
@@ -124,10 +132,11 @@ async function fetchWeatherData() {
               lastUpdateTime = observation.dateutc; // Update the new update time
               document.getElementById("last-update").textContent = lastUpdate.toLocaleString();
               checkingEveryMinute = false; // Switch back to 5-minute schedule
+              console.log("On 5-minute schedule.");
           } else {
-              console.log("Data hasn't changed. Switching to 1-minute schedule.");
+              console.log("No Change To Data. Switching to 30-sec schedule.");
               if (!checkingEveryMinute) {
-                  checkingEveryMinute = true; // Activate 1-minute schedule
+                  checkingEveryMinute = true; // Activate 30-sec schedule
                   startCheckingEveryMinute(); // Switch schedules
               }
               return; // Skip UI update if data hasn't changed
@@ -213,6 +222,7 @@ function guessCurrentCondition(observation, currentHour) {
   console.log("Current Hour Passed: ", currentHour);
 
   // Extract observation values
+  const absPressure = observation.baromabsin !== undefined ? observation.baromabsin : 29.92;
   const temperature = observation.tempf !== undefined ? observation.tempf : null;
   const humidity = observation.humidity !== undefined ? observation.humidity : null;
   const windSpeed = observation.windspeedmph !== undefined ? observation.windspeedmph : 0;
@@ -234,9 +244,8 @@ function guessCurrentCondition(observation, currentHour) {
   // Get dew point
   console.log("Temperature: ", temperature);
   console.log("Humidity: ", humidity);
-  console.log("Pressure (defaulting to 29.92): ", 29.92);
-  const dewPoint = calculateDewPoint(temperature, humidity);
-  console.log("Calculated Dew Point: ", dewPoint);
+  const dewPoint = calculateDewPoint(temperature, humidity, absPressure);
+  console.log("Guess Call DP : ", dewPoint);
     if (typeof dewPoint === "number") {
         console.log(`API Dew Point: ${dewPoint.toFixed(1)}°F`);
     } else {
@@ -335,12 +344,14 @@ function guessCurrentCondition(observation, currentHour) {
 
     
 function snowCheck(observation) {
-  const temperature = observation.tempf; // Using AmbientWeather temperature
-  const humidity = observation.humidity; 
-  const dewPoint = calculateDewPoint(temperature, humidity);
+    const absPressure = observation.baromabsin !== undefined ? observation.baromabsin : 29.92;
+    const temperature = observation.tempf; // Using AmbientWeather temperature
+    const humidity = observation.humidity; 
+    const dewPoint = calculateDewPoint(temperature, humidity, absPressure);
+    console.log("Snow Call DP: ", dewPoint);
 
-  if (temperature >= 34 || dewPoint > 30 || humidity < 70) {
-      return [false, 0]; // No snow
+    if (temperature >= 34 || dewPoint > 30 || humidity < 70) {
+        return [false, 0]; // No snow
   }
     
     // Base snow chance calculation
@@ -577,7 +588,7 @@ function clearAndResetTimer() {
 }
 
 function startCheckingEveryMinute() {
-    console.log("Switching to 30-Seconds schedule...");
+    console.log("On 30-Seconds schedule...");
     
     // Clear any previous intervals
     if (intervalId) {
