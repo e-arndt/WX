@@ -129,12 +129,12 @@ async function fetchWeatherData() {
           console.log("Last Update Time: ", lastUpdate);
 
           if (observation.dateutc !== lastUpdateTime) {
-              lastUpdateTime = observation.dateutc; // Update the new update time
+              lastUpdateTime = observation.dateutc; // Update to the new update time
               document.getElementById("last-update").textContent = lastUpdate.toLocaleString();
               checkingEveryMinute = false; // Switch back to 5-minute schedule
               console.log("On 5-minute schedule.");
           } else {
-              console.log("No Change To Data. Switching to 30-sec schedule.");
+              console.log("No Data Update... ");
               if (!checkingEveryMinute) {
                   checkingEveryMinute = true; // Activate 30-sec schedule
                   startCheckingEveryMinute(); // Switch schedules
@@ -589,15 +589,14 @@ function clearAndResetTimer() {
 
 function startCheckingEveryMinute() {
     console.log("On 30-Seconds schedule...");
-    
-    // Clear any previous intervals
-    if (intervalId) {
-        clearInterval(intervalId);
-    }
-    
-    // Set a new interval for 1-minute polling
-    intervalId = setInterval(fetchWeatherData, 30 * 1000); // 30 seconds
+    setTimeout(() => {
+        // Perform the 30-second check after the delay
+        fetchWeatherData(); 
+        checkingEveryMinute = false; // Reset to normal schedule after the check
+        console.log("30-second check complete. Returning to 5-minute schedule.");
+    }, 30000); // Wait 30 seconds before executing the fetch
 }
+
 
 
 function updateCountdownText(nextUpdateTimerElem, secondsRemaining) {
