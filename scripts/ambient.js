@@ -492,7 +492,7 @@ function solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour)
       solarCondition = "☀️ Sunny";
   } else if (solarRadiation > 0 && solarRadiation < 5 && currentHour >= 16) {
       solarCondition = "🌇 Twilight";
-  } else if (solarRadiation > 0 && solarRadiation <= 15 && (currentHour >= 6 || currentHour < 11)) {
+  } else if (solarRadiation > 0 && solarRadiation <= 15 && (currentHour >= 6 && currentHour < 11)) {
         solarCondition = "🌄 Morning";
   } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 8)) {
       solarCondition = "🌃 Night";

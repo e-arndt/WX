@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
-		"liveServer.settings.multiRootWorkspaceName": "WX"
+		"liveServer.settings.multiRootWorkspaceName": "WX",
+		"liveServer.settings.port": 5501
 	}
 }
