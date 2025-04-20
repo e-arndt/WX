@@ -302,7 +302,7 @@ function guessCurrentCondition(observation, currentHour) {
       conditions.push({ condition: windCondition, severity });
   }
 
-  const solarCondition = solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour);
+  const solarCondition = solarCheck(solarRadiation, uvIndex, humidity, temperature, dewPoint, observation.windspeedmph, currentHour);
   if (solarCondition && solarCondition !== false) { // Exclude invalid values
       const solarSeverityMap = {
           "😎 Bright Sun": 20,
@@ -472,35 +472,36 @@ function windCheck(windSpeed, windGust) {
 }
     
 
-function solarCheck(solarRadiation, uvIndex, humidity, temperature, currentHour) {
-  // Determine solar condition
-  let solarCondition = null;
-
-  if (solarRadiation > 600 && uvIndex > 4) {
-      solarCondition = "😎 Bright Sun";
-  } else if (solarRadiation > 59 && uvIndex > 0 && humidity > 70 && temperature > 75) {
-      solarCondition = "💦😎 Muggy";
-  } else if (humidity > 69 && solarRadiation >= 119 && solarRadiation < 299) {
-      solarCondition = "🌤️ Partly Sunny";
-  } else if (humidity > 69 && solarRadiation > 59 && solarRadiation < 119) {
-      solarCondition = "🌤️ Hazy";
-  } else if (solarRadiation < 15 && humidity >= 90 && (temperature - dewPoint) <= 2 && windspeedmph < 3) {
-      solarCondition = "🌫️ Foggy";
-  } else if (solarRadiation >= 1 && solarRadiation < 59 && (temperature - dewPoint <= 7)) {
-      solarCondition = "☁️ Overcast";
-  } else if (solarRadiation > 15 && humidity < 70) {
-      solarCondition = "☀️ Sunny";
-  } else if (solarRadiation > 0 && solarRadiation < 5 && currentHour >= 16) {
-      solarCondition = "🌇 Twilight";
-  } else if (solarRadiation > 0 && solarRadiation <= 15 && (currentHour >= 6 && currentHour < 11)) {
+function solarCheck(solarRadiation, uvIndex, humidity, temperature, dewPoint, windspeedmph, currentHour) {
+    // Determine solar condition
+    let solarCondition = null;
+  
+    if (solarRadiation > 600 && uvIndex > 4) {
+        solarCondition = "😎 Bright Sun";
+    } else if (solarRadiation > 59 && uvIndex > 0 && humidity > 70 && temperature > 75) {
+        solarCondition = "💦😎 Muggy";
+    } else if (humidity > 69 && solarRadiation >= 119 && solarRadiation < 299) {
+        solarCondition = "🌤️ Partly Sunny";
+    } else if (humidity > 69 && solarRadiation > 59 && solarRadiation < 119) {
+        solarCondition = "🌤️ Hazy";
+    } else if (solarRadiation < 15 && humidity >= 90 && (temperature - dewPoint) <= 2 && windspeedmph < 3) {
+        solarCondition = "🌫️ Foggy";
+    } else if (solarRadiation >= 1 && solarRadiation < 59 && (temperature - dewPoint <= 7)) {
+        solarCondition = "☁️ Overcast";
+    } else if (solarRadiation > 15 && humidity < 70) {
+        solarCondition = "☀️ Sunny";
+    } else if (solarRadiation > 0 && solarRadiation < 5 && currentHour >= 16) {
+        solarCondition = "🌇 Twilight";
+    } else if (solarRadiation > 0 && solarRadiation <= 15 && (currentHour >= 6 && currentHour < 11)) {
         solarCondition = "🌄 Morning";
-  } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 8)) {
-      solarCondition = "🌃 Night";
+    } else if (solarRadiation <= 0 && (currentHour >= 16 || currentHour < 8)) {
+        solarCondition = "🌃 Night";
+    }
+  
+    // Use "😌 Calm" only if no other condition matches
+    return solarCondition || "😌 Calm";
   }
-
-  // Use "😌 Calm" only if no other condition matches
-  return solarCondition || "😌 Calm";
-}
+  
 
 
 
