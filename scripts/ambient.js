@@ -488,7 +488,7 @@ function solarCheck(solarRadiation, uvIndex, humidity, temperature, dewPoint, wi
         solarCondition = "🌫️ Foggy";
     } else if (solarRadiation >= 1 && solarRadiation < 59 && (temperature - dewPoint <= 7)) {
         solarCondition = "☁️ Overcast";
-    } else if (solarRadiation > 15 && humidity < 70) {
+    } else if (solarRadiation > 15 && humidity < 75) {
         solarCondition = "☀️ Sunny";
     } else if (solarRadiation > 0 && solarRadiation < 5 && currentHour >= 16) {
         solarCondition = "🌇 Twilight";
