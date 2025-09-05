@@ -484,11 +484,11 @@ function solarCheck(solarRadiation, uvIndex, humidity, temperature, dewPoint, wi
         solarCondition = "🌤️ Partly Sunny";
     } else if (humidity > 69 && solarRadiation > 59 && solarRadiation < 119) {
         solarCondition = "🌤️ Hazy";
-    } else if (solarRadiation < 15 && humidity > 98 && (temperature - dewPoint) < 2 && windspeedmph < 3) {
+    } else if (solarRadiation < 35 && humidity > 98 && (temperature - dewPoint) < 2 && windspeedmph < 3) {
         solarCondition = "🌫️ Foggy";
     } else if (solarRadiation >= 4 && solarRadiation < 59 && (temperature - dewPoint <= 7)) {
         solarCondition = "☁️ Overcast";
-    } else if (solarRadiation > 15 && humidity < 70) {
+    } else if (solarRadiation > 35 && humidity < 70) {
         solarCondition = "☀️ Sunny";
     } else if (solarRadiation > 0 && solarRadiation < 5 && currentHour >= 16) {
         solarCondition = "🌇 Twilight";
